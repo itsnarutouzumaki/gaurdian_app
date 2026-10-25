@@ -55,7 +55,7 @@ export default function DatePickerModal({
     >
       <View style={s.backdrop}>
         <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
-        <Card padding={16} style={{ width: "100%", maxWidth: 370 }}>
+        <Card padding={16} style={s.calendarCard}>
           <View style={s.row}>
             <AppText size={16} weight="bold">
               {title}
@@ -66,7 +66,7 @@ export default function DatePickerModal({
               </AppText>
             </Pressable>
           </View>
-          <View style={[s.row, { marginTop: 15, marginBottom: 10 }]}>
+          <View style={[s.row, s.monthNavigation]}>
             <Pressable onPress={() => moveMonth(-1)} style={s.arrow}>
               <AppText size={22} color={C.primary}>
                 ‹
@@ -129,7 +129,7 @@ export default function DatePickerModal({
             title="Cancel"
             variant="outline"
             onPress={onClose}
-            style={{ marginTop: 14 }}
+            style={s.cancelButton}
           />
         </Card>
       </View>

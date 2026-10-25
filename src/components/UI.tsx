@@ -65,14 +65,14 @@ export function Page({
               <Text style={styles.headerSubtitle}>{subtitle}</Text>
             ) : null}
           </View>
-          {right || <View style={{ width: 28 }} />}
+          {right || <View style={styles.rightPlaceholder} />}
         </View>
       ) : null}
       {scroll ? (
         <ScrollView
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 24 }}
+          contentContainerStyle={styles.scrollContent}
         >
           {content}
         </ScrollView>
@@ -294,7 +294,7 @@ export function ActionButton({
           size={compact ? 15 : 17}
           color={fg}
           weight="bold"
-          style={{ marginRight: 7 }}
+          style={styles.buttonIcon}
         >
           {icon}
         </AppText>
@@ -341,12 +341,12 @@ export function Field({
   autoCapitalize?: "none" | "sentences" | "words" | "characters";
 }) {
   return (
-    <View style={{ marginBottom: 14 }}>
+    <View style={styles.field}>
       <AppText
         size={12}
         color={C.text}
         weight="semibold"
-        style={{ marginBottom: 7 }}
+        style={styles.fieldLabel}
       >
         {label}
         {required ? (
@@ -384,11 +384,11 @@ export function Field({
         {rightAction}
       </View>
       {error ? (
-        <AppText size={11} color={C.danger} style={{ marginTop: 4 }}>
+        <AppText size={11} color={C.danger} style={styles.fieldMessage}>
           {error}
         </AppText>
       ) : !editable ? (
-        <AppText size={10} color={C.muted} style={{ marginTop: 4 }}>
+        <AppText size={10} color={C.muted} style={styles.fieldMessage}>
           This field cannot be changed in the guardian app.
         </AppText>
       ) : null}
@@ -457,14 +457,8 @@ export function Photo({
   return (
     <View
       style={[
-        {
-          height,
-          borderRadius: radius,
-          overflow: "hidden",
-          backgroundColor: "#DCEBFB",
-          justifyContent: "center",
-          alignItems: "center",
-        },
+        styles.photo,
+        { height, borderRadius: radius },
         style,
       ]}
     >
@@ -498,12 +492,12 @@ export function SectionTitle({
 }) {
   return (
     <View style={styles.sectionTitleRow}>
-      <View style={{ flex: 1 }}>
+      <View style={styles.flex}>
         <AppText size={16} weight="bold">
           {title}
         </AppText>
         {subtitle ? (
-          <AppText size={12} color={C.muted} style={{ marginTop: 2 }}>
+          <AppText size={12} color={C.muted} style={styles.subtleText}>
             {subtitle}
           </AppText>
         ) : null}
@@ -580,7 +574,7 @@ export function Badge({
 export function Divider({ space = 12 }: { space?: number }) {
   return (
     <View
-      style={{ height: 1, backgroundColor: C.border, marginVertical: space }}
+      style={[styles.divider, { marginVertical: space }]}
     />
   );
 }
@@ -621,11 +615,11 @@ export function InfoBanner({
           {icon}
         </AppText>
       </View>
-      <View style={{ flex: 1 }}>
+      <View style={styles.flex}>
         <AppText size={12} weight="semibold" color={color}>
           {title}
         </AppText>
-        <AppText size={11} color={C.text} style={{ marginTop: 2 }}>
+        <AppText size={11} color={C.text} style={styles.subtleText}>
           {message}
         </AppText>
       </View>
@@ -701,7 +695,7 @@ export function ModalFrame({
           <AppText size={17} weight="bold">
             {title}
           </AppText>
-          <View style={{ marginTop: 12 }}>{children}</View>
+          <View style={styles.modalContent}>{children}</View>
         </View>
       </View>
     </Modal>

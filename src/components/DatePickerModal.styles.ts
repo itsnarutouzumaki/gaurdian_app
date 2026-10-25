@@ -29,4 +29,7 @@ export const datePickerStyles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  calendarCard: { width: "100%", maxWidth: 370 },
+  monthNavigation: { marginTop: 15, marginBottom: 10 },
+  cancelButton: { marginTop: 14 },
 });

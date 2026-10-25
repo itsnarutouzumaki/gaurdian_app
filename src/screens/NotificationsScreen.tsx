@@ -19,6 +19,7 @@ import {
   getNotificationAppearance,
   getNotificationTarget,
 } from "../lib/notifications";
+import { styles } from "./NotificationsScreen.styles";
 
 export function NotificationsScreen() {
   const {
@@ -41,13 +42,6 @@ export function NotificationsScreen() {
       ),
     [notifications, filter],
   );
-  const styleFor = (type: string): [string, string, string] => {
-    if (type === "request") return [C.successSoft, C.success, "↗"];
-    if (type === "complaint") return [C.orangeSoft, C.orange, "!"];
-    if (type === "fee") return [C.purpleSoft, C.purple, "₹"];
-    if (type === "result") return [C.blueSoft, C.primary, "▤"];
-    return [C.blueSoft, C.primary, "i"];
-  };
   return (
     <Page
       title="Notifications"
@@ -72,7 +66,7 @@ export function NotificationsScreen() {
         ) : undefined
       }
     >
-      <View style={{ flexDirection: "row", gap: 7 }}>
+      <View style={styles.filters}>
         {NOTIFICATION_FILTERS.map((item) => (
           <Chip
             key={item}
@@ -111,64 +105,35 @@ export function NotificationsScreen() {
               }
             }}
           >
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "flex-start",
-                gap: 11,
-              }}
-            >
+            <View style={styles.notificationRow}>
               <View
-                style={{
-                  width: 43,
-                  height: 43,
-                  borderRadius: 14,
-                  backgroundColor,
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
+                style={[styles.iconBox, { backgroundColor }]}
               >
                 <AppText size={19} weight="bold" color={color}>
                   {icon}
                 </AppText>
               </View>
-              <View style={{ flex: 1 }}>
-                <View
-                  style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
-                >
+              <View style={styles.flex}>
+                <View style={styles.titleRow}>
                   <AppText
                     size={13}
                     weight={item.read ? "semibold" : "bold"}
-                    style={{ flex: 1 }}
+                    style={styles.title}
                   >
                     {item.title}
                   </AppText>
                   {!item.read ? (
-                    <View
-                      style={{
-                        width: 7,
-                        height: 7,
-                        borderRadius: 4,
-                        backgroundColor: C.primary,
-                      }}
-                    />
+                    <View style={styles.unreadDot} />
                   ) : null}
                 </View>
                 <AppText
                   size={11}
                   color={C.muted}
-                  style={{ marginTop: 4, lineHeight: 17 }}
+                  style={styles.message}
                 >
                   {item.message}
                 </AppText>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    marginTop: 8,
-                  }}
-                >
+                <View style={styles.metadata}>
                   <AppText size={10} color={C.muted}>
                     {item.dateLabel}
                   </AppText>
@@ -193,7 +158,7 @@ export function NotificationsScreen() {
             size={11}
             color={C.muted}
             align="center"
-            style={{ marginTop: 4 }}
+            style={styles.emptyHint}
           >
             Try another filter or check back later.
           </AppText>

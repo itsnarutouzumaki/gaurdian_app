@@ -1,0 +1,72 @@
+import { StyleSheet } from "react-native";
+import { C } from "../theme";
+
+export const styles = StyleSheet.create({
+  ringWrap: { alignItems: "center", paddingVertical: 8 },
+  ringOuter: {
+    width: 152,
+    height: 152,
+    borderRadius: 76,
+    borderWidth: 12,
+    borderColor: "#DCEFE5",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  ringInner: {
+    width: 128,
+    height: 128,
+    borderRadius: 64,
+    borderWidth: 9,
+    borderColor: C.success,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: -3,
+  },
+  statRow: { flexDirection: "row", gap: 7, marginTop: 9 },
+  statCell: {
+    flex: 1,
+    backgroundColor: C.bg,
+    borderRadius: 11,
+    alignItems: "center",
+    paddingVertical: 10,
+  },
+  monthNav: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  weekdayRow: { flexDirection: "row", flexWrap: "wrap", marginTop: 14 },
+  weekday: {
+    width: `${100 / 7}%`,
+    alignItems: "center",
+    paddingBottom: 8,
+  },
+  calendarRow: { flexDirection: "row", flexWrap: "wrap" },
+  emptyDay: { width: `${100 / 7}%`, height: 36 },
+  dayCell: {
+    width: `${100 / 7}%`,
+    height: 36,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  dayInner: {
+    height: 29,
+    width: 31,
+    borderRadius: 9,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  present: { backgroundColor: "#DDF6E7" },
+  absent: { backgroundColor: "#FFE1E3" },
+  holiday: { backgroundColor: "#DCEAFF" },
+  noClass: { backgroundColor: "#F0F3F7" },
+  unmarked: { backgroundColor: C.surface },
+  legendRow: { flexDirection: "row", flexWrap: "wrap", gap: 10 },
+  legendItem: { flexDirection: "row", alignItems: "center", gap: 5 },
+  legendSwatch: {
+    width: 9,
+    height: 9,
+    borderRadius: 3,
+    borderWidth: 1,
+  },
+});

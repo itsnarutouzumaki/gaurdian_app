@@ -14,7 +14,7 @@
     "android": {
       "package": "com.greenwoodinternational.guardian",
       "adaptiveIcon": {
-        "backgroundColor": "#0c010f"
+        "backgroundColor": "#073C88"
       }
     },
     "plugins": [

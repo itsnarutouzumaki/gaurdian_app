@@ -3,7 +3,7 @@ const path = require('node:path');
 const ts = require('typescript');
 const root = path.join(__dirname, '..');
 const sourceRoot = path.join(root, 'src');
-const files = [path.join(root, 'App.tsx')];
+const files = [path.join(root, 'App.tsx'), path.join(root, 'App.styles.ts')];
 function walk(directory) {
   for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
     const absolute = path.join(directory, entry.name);

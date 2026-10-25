@@ -1,9 +1,9 @@
 import { StyleSheet } from "react-native";
-import { C, R } from "../theme";
+import { C, R, S } from "../theme";
 
 export const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: C.bg },
-  pageContent: { paddingHorizontal: 16, paddingTop: 14, gap: 13 },
+  pageContent: { paddingHorizontal: S.lg, paddingTop: 14, gap: 13 },
   header: {
     minHeight: 58,
     flexDirection: "row",
@@ -49,7 +49,7 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 12,
+    paddingHorizontal: S.md,
   },
   fieldWrap: {
     minHeight: 45,
@@ -93,10 +93,15 @@ export const styles = StyleSheet.create({
   badge: {
     borderRadius: R.pill,
     alignSelf: "flex-start",
-    paddingHorizontal: 8,
+    paddingHorizontal: S.sm,
     paddingVertical: 4,
   },
-  infoBanner: { flexDirection: "row", gap: 9, padding: 12, borderRadius: 13 },
+  infoBanner: {
+    flexDirection: "row",
+    gap: 9,
+    padding: S.md,
+    borderRadius: 13,
+  },
   infoIcon: {
     width: 22,
     height: 22,
@@ -151,4 +156,20 @@ export const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   selectLabel: { marginBottom: 7 },
+  rightPlaceholder: { width: 28 },
+  scrollContent: { paddingBottom: 24 },
+  buttonIcon: { marginRight: 7 },
+  field: { marginBottom: 14 },
+  fieldLabel: { marginBottom: 7 },
+  fieldMessage: { marginTop: 4 },
+  photo: {
+    overflow: "hidden",
+    backgroundColor: "#DCEBFB",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  flex: { flex: 1 },
+  subtleText: { marginTop: 2 },
+  divider: { height: 1, backgroundColor: C.border },
+  modalContent: { marginTop: 12 },
 });

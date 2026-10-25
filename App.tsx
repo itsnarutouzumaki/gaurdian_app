@@ -6,12 +6,13 @@ import type { AppContextValue } from "./src/app-context";
 import mock from "./src/data/mock-data.json";
 import config from "./src/data/school-config.json";
 import type {
-  ChildRecord,
+  ComplaintRecord,
   GuardianProfile,
+  LeaveRequestRecord,
+  LinkRequestRecord,
   Notice,
   Route,
   ScreenName,
-  TeacherRecord,
   ToastMessage,
 } from "./src/types";
 import { C } from "./src/theme";
@@ -22,42 +23,34 @@ import {
   ModalFrame,
   Spacer,
 } from "./src/components/UI";
-import {
-  SplashScreen,
-  LoginScreen,
-  SignUpScreen,
-  ForgotPasswordScreen,
-} from "./src/screens/AuthScreens";
-import {
-  HomeScreen,
-  AddChildScreen,
-  ChildDashboardScreen,
-  AttendanceScreen,
-  ResultsScreen,
-  SubjectResultsScreen,
-} from "./src/screens/MainScreens";
-import {
-  FeesReceiptScreen,
-  RaiseComplaintScreen,
-  LeaveRequestScreen,
-} from "./src/screens/RequestScreens";
-import {
-  MyProfileScreen,
-  EditProfileScreen,
-  ChangePasswordScreen,
-  HelpSupportScreen,
-  TermsConditionsScreen,
-  PrivacyPolicyScreen,
-} from "./src/screens/ProfileScreens";
+import { styles } from "./App.styles";
+import { SplashScreen } from "./src/screens/SplashScreen";
+import { LoginScreen } from "./src/screens/LoginScreen";
+import { SignUpScreen } from "./src/screens/SignUpScreen";
+import { ForgotPasswordScreen } from "./src/screens/ForgotPasswordScreen";
+import { HomeScreen } from "./src/screens/HomeScreen";
+import { AddChildScreen } from "./src/screens/AddChildScreen";
+import { ChildDashboardScreen } from "./src/screens/ChildDashboardScreen";
+import { AttendanceScreen } from "./src/screens/AttendanceScreen";
+import { ResultsScreen } from "./src/screens/ResultsScreen";
+import { SubjectResultsScreen } from "./src/screens/SubjectResultsScreen";
+import { FeesReceiptScreen } from "./src/screens/FeesReceiptScreen";
+import { RaiseComplaintScreen } from "./src/screens/RaiseComplaintScreen";
+import { LeaveRequestScreen } from "./src/screens/LeaveRequestScreen";
+import { MyProfileScreen } from "./src/screens/MyProfileScreen";
+import { EditProfileScreen } from "./src/screens/EditProfileScreen";
+import { ChangePasswordScreen } from "./src/screens/ChangePasswordScreen";
+import { HelpSupportScreen } from "./src/screens/HelpSupportScreen";
+import { TermsConditionsScreen } from "./src/screens/TermsConditionsScreen";
+import { PrivacyPolicyScreen } from "./src/screens/PrivacyPolicyScreen";
 import { NotificationsScreen } from "./src/screens/NotificationsScreen";
-import {
-  SchoolDetailsScreen,
-  TeachersDirectoryScreen,
-  TeacherProfileScreen,
-} from "./src/screens/SchoolScreens";
+import { SchoolDetailsScreen } from "./src/screens/SchoolDetailsScreen";
+import { TeachersDirectoryScreen } from "./src/screens/TeachersDirectoryScreen";
+import { TeacherProfileScreen } from "./src/screens/TeacherProfileScreen";
 
-const seed = mock as any;
-const schoolConfig = config as any;
+const seed = mock;
+const schoolConfig = config;
+const children = seed.children;
 
 export default function App() {
   const [stack, setStack] = useState<Route[]>([{ name: "Splash" }]);
@@ -68,17 +61,17 @@ export default function App() {
   const [notifications, setNotifications] = useState<Notice[]>(() =>
     seed.notifications.map((item: Notice) => ({ ...item })),
   );
-  const [complaints, setComplaints] = useState<any[]>(() =>
-    seed.complaints.map((item: any) => ({ ...item })),
+  const [complaints, setComplaints] = useState<ComplaintRecord[]>(() =>
+    seed.complaints.map((item) => ({ ...item })),
   );
-  const [leaveRequests, setLeaveRequests] = useState<any[]>(() =>
-    seed.leaveRequests.map((item: any) => ({ ...item })),
+  const [leaveRequests, setLeaveRequests] = useState<LeaveRequestRecord[]>(() =>
+    seed.leaveRequests.map((item) => ({ ...item })),
   );
-  const [linkRequests, setLinkRequests] = useState<any[]>(() =>
-    seed.linkRequests.map((item: any) => ({ ...item })),
+  const [linkRequests, setLinkRequests] = useState<LinkRequestRecord[]>(() =>
+    seed.linkRequests.map((item) => ({ ...item })),
   );
   const [selectedChildId, setSelectedChildIdState] = useState<string>(
-    seed.children[0]?.id || "",
+    children[0]?.id || "",
   );
   const [selectedYear, setSelectedYear] = useState<string>(
     schoolConfig.app.defaultAcademicYear,
@@ -94,13 +87,13 @@ export default function App() {
   };
 
   const navigate = useCallback(
-    (name: ScreenName, params?: Record<string, any>) => {
+    (name: ScreenName, params?: Record<string, unknown>) => {
       setStack((previous) => [...previous, { name, params }]);
     },
     [],
   );
   const replace = useCallback(
-    (name: ScreenName, params?: Record<string, any>) => {
+    (name: ScreenName, params?: Record<string, unknown>) => {
       setStack((previous) => [...previous.slice(0, -1), { name, params }]);
     },
     [],
@@ -122,7 +115,7 @@ export default function App() {
   }, []);
   const changeChild = useCallback((id: string) => {
     setSelectedChildIdState(id);
-    const child = seed.children.find((item: ChildRecord) => item.id === id);
+    const child = children.find((item) => item.id === id);
     if (child) setSelectedYear(child.currentAcademicYear);
   }, []);
   const signIn = useCallback(() => {
@@ -134,7 +127,7 @@ export default function App() {
       school: schoolConfig.school,
       guardian,
       setGuardian,
-      children: seed.children as ChildRecord[],
+      children,
       notifications,
       setNotifications,
       complaints,
@@ -143,7 +136,7 @@ export default function App() {
       setLeaveRequests,
       linkRequests,
       setLinkRequests,
-      teachers: seed.teachers as TeacherRecord[],
+      teachers: seed.teachers,
       selectedChildId,
       setSelectedChildId: changeChild,
       selectedYear,
@@ -267,42 +260,33 @@ export default function App() {
     <SafeAreaProvider>
       <AppProvider value={value}>
         <StatusBar barStyle="dark-content" />
-        <View style={{ flex: 1, backgroundColor: C.bg }}>
-          <View style={{ flex: 1 }}>{renderScreen()}</View>
+        <View style={styles.app}>
+          <View style={styles.screen}>{renderScreen()}</View>
           {showTabs ? (
             <BottomTabs active={activeTab} onPress={onTabPress} />
           ) : null}
           {toast ? (
             <View
-              style={{
-                position: "absolute",
-                left: 14,
-                right: 14,
-                bottom: showTabs ? 72 : 18,
-                zIndex: 20,
-              }}
+              style={[styles.toastPosition, { bottom: showTabs ? 72 : 18 }]}
             >
               <View
-                style={{
-                  backgroundColor:
-                    toast.tone === "error"
-                      ? "#922A35"
-                      : toast.tone === "success"
-                        ? "#087347"
-                        : "#123C73",
-                  borderRadius: 14,
-                  padding: 13,
-                  shadowColor: "#000",
-                  shadowOpacity: 0.2,
-                  shadowRadius: 12,
-                  elevation: 6,
-                }}
+                style={[
+                  styles.toast,
+                  {
+                    backgroundColor:
+                      toast.tone === "error"
+                        ? "#922A35"
+                        : toast.tone === "success"
+                          ? "#087347"
+                          : "#123C73",
+                  },
+                ]}
               >
                 <AppText size={13} color="#FFFFFF" weight="bold">
                   {toast.title}
                 </AppText>
                 {toast.message ? (
-                  <AppText size={11} color="#EAF3FF" style={{ marginTop: 3 }}>
+                  <AppText size={11} color="#EAF3FF" style={styles.toastMessage}>
                     {toast.message}
                   </AppText>
                 ) : null}
@@ -317,12 +301,12 @@ export default function App() {
             <AppText size={13} color={C.muted} lineHeight={20}>
               Are you sure you want to log out of your guardian account?
             </AppText>
-            <View style={{ flexDirection: "row", gap: 9, marginTop: 20 }}>
+            <View style={styles.logoutActions}>
               <ActionButton
                 title="Cancel"
                 variant="outline"
                 onPress={() => setLogoutDialogVisible(false)}
-                style={{ flex: 1 }}
+                style={styles.logoutAction}
               />
               <ActionButton
                 title="Logout"
@@ -333,7 +317,7 @@ export default function App() {
                   setStack([{ name: "Login" }]);
                   setToast(null);
                 }}
-                style={{ flex: 1 }}
+                style={styles.logoutAction}
               />
             </View>
           </ModalFrame>

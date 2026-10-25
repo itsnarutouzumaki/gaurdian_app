@@ -2,6 +2,14 @@ import { StyleSheet } from "react-native";
 import { C } from "../theme";
 
 export const selectorStyles = StyleSheet.create({
+  yearContainer: { gap: 8 },
+  yearContent: { alignItems: "center", paddingRight: 8 },
+  helperText: { marginTop: 5, marginBottom: 12 },
+  helperSpacer: { height: 12 },
+  options: { maxHeight: 390 },
+  choiceContent: { flex: 1 },
+  optionDetail: { marginTop: 3 },
+  closeButton: { marginTop: 14 },
   backdrop: {
     flex: 1,
     justifyContent: "flex-end",

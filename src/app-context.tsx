@@ -1,27 +1,31 @@
 import React, { createContext, useContext } from "react";
 import type {
   ChildRecord,
+  ComplaintRecord,
   GuardianProfile,
+  LeaveRequestRecord,
+  LinkRequestRecord,
   Notice,
   Route,
+  SchoolConfig,
   ScreenName,
   TeacherRecord,
   ToastMessage,
 } from "./types";
 
 export type AppContextValue = {
-  school: any;
+  school: SchoolConfig;
   guardian: GuardianProfile;
   setGuardian: React.Dispatch<React.SetStateAction<GuardianProfile>>;
   children: ChildRecord[];
   notifications: Notice[];
   setNotifications: React.Dispatch<React.SetStateAction<Notice[]>>;
-  complaints: any[];
-  setComplaints: React.Dispatch<React.SetStateAction<any[]>>;
-  leaveRequests: any[];
-  setLeaveRequests: React.Dispatch<React.SetStateAction<any[]>>;
-  linkRequests: any[];
-  setLinkRequests: React.Dispatch<React.SetStateAction<any[]>>;
+  complaints: ComplaintRecord[];
+  setComplaints: React.Dispatch<React.SetStateAction<ComplaintRecord[]>>;
+  leaveRequests: LeaveRequestRecord[];
+  setLeaveRequests: React.Dispatch<React.SetStateAction<LeaveRequestRecord[]>>;
+  linkRequests: LinkRequestRecord[];
+  setLinkRequests: React.Dispatch<React.SetStateAction<LinkRequestRecord[]>>;
   teachers: TeacherRecord[];
   selectedChildId: string;
   setSelectedChildId: (id: string) => void;
@@ -32,8 +36,8 @@ export type AppContextValue = {
   selectedTeacherId: string;
   setSelectedTeacherId: (id: string) => void;
   currentRoute: Route;
-  navigate: (name: ScreenName, params?: Record<string, any>) => void;
-  replace: (name: ScreenName, params?: Record<string, any>) => void;
+  navigate: (name: ScreenName, params?: Record<string, unknown>) => void;
+  replace: (name: ScreenName, params?: Record<string, unknown>) => void;
   goBack: () => void;
   resetTo: (name: ScreenName) => void;
   showToast: (toast: ToastMessage) => void;

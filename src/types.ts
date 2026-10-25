@@ -1,3 +1,6 @@
+import type mock from "./data/mock-data.json";
+import type config from "./data/school-config.json";
+
 export type ScreenName =
   | 'Splash' | 'Login' | 'SignUp' | 'ForgotPassword' | 'Home' | 'AddChild'
   | 'ChildDashboard' | 'Attendance' | 'Results' | 'SubjectResults' | 'FeesReceipt'
@@ -5,8 +8,36 @@ export type ScreenName =
   | 'ChangePassword' | 'HelpSupport' | 'TermsConditions' | 'PrivacyPolicy'
   | 'SchoolDetails' | 'TeachersDirectory' | 'TeacherProfile';
 
-export type Route = { name: ScreenName; params?: Record<string, any> };
+export type Route = { name: ScreenName; params?: Record<string, unknown> };
 export type AttendanceStatus = 'present' | 'absent' | 'holiday' | 'noClass' | 'unmarked';
+export type SchoolConfig = typeof config.school;
+export type ComplaintRecord = {
+  id: string;
+  childId: string;
+  subject: string;
+  message: string;
+  attachmentName: string | null;
+  status: string;
+  createdAt: string;
+};
+export type LeaveRequestRecord = {
+  id: string;
+  childId: string;
+  startDate: string;
+  endDate: string;
+  reason: string;
+  status: string;
+  createdAt: string;
+};
+export type LinkRequestRecord = {
+  id: string;
+  studentId: string;
+  studentName: string;
+  status: string;
+  createdAt: string;
+};
+export type HelpTopic = (typeof mock.helpTopics)[number];
+export type PolicySection = (typeof mock.termsSections)[number];
 export type GuardianProfile = {
   id: string;
   fullName: string;
@@ -17,63 +48,11 @@ export type GuardianProfile = {
   relationship: string;
   profileComplete?: boolean;
 };
-export type ChildRecord = {
-  id: string;
-  fullName: string;
-  photoUrl: string;
-  studentId: string;
-  className: string;
-  section: string;
-  currentAcademicYear: string;
-  academicYears: AcademicYearRecord[];
-  [key: string]: any;
-};
-export type AcademicYearRecord = {
-  label: string;
-  startYear: number;
-  className: string;
-  section: string;
-  attendance: {
-    totalClasses: number;
-    present: number;
-    absent: number;
-    holidays: number;
-    percentage: number;
-    months: Array<{ month: string; monthNumber: number; year: number; records: Array<{ day: number; date: string; status: AttendanceStatus }> }>;
-  };
-  subjects: SubjectRecord[];
-  feeReceipts: FeeReceiptRecord[];
-  classTeacherId: string;
-};
-export type SubjectRecord = {
-  id: string;
-  name: string;
-  teacherId: string;
-  icon: string;
-  color: string;
-  tests: TestRecord[];
-};
-export type TestRecord = {
-  id: string;
-  name: string;
-  date: string;
-  score: number;
-  maxScore: number;
-  teacherId: string;
-  copyAvailable: boolean;
-  teacherRemarks?: string;
-};
-export type FeeReceiptRecord = {
-  id: string;
-  label: string;
-  academicYear: string;
-  breakdown: Record<string, number>;
-  total: number;
-  paid: boolean;
-  paymentDate: string;
-  paymentMode: string;
-  transactionId: string;
-};
+export type ChildRecord = (typeof mock.children)[number];
+export type AcademicYearRecord = ChildRecord["academicYears"][number];
+export type SubjectRecord = AcademicYearRecord["subjects"][number];
+export type TestRecord = SubjectRecord["tests"][number];
+export type FeeReceiptRecord = AcademicYearRecord["feeReceipts"][number];
 export type TeacherRecord = {
   id: string;
   name: string;

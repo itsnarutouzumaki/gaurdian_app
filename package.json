@@ -10,9 +10,10 @@
     "typecheck": "tsc --noEmit",
     "data:check": "node scripts/check-data.js",
     "config:apply": "node scripts/apply-school-config.js",
-    "verify": "npm run data:check && npm run route:check && npm run syntax:check && npm run logic:check && npm run typecheck",
+    "verify": "npm run data:check && npm run route:check && npm run syntax:check && npm run style:check && npm run logic:check && npm run typecheck",
     "route:check": "node scripts/check-routes.js",
     "syntax:check": "node scripts/check-source-syntax.js",
+    "style:check": "node scripts/check-inline-styles.js",
     "logic:check": "node scripts/check-logic.js"
   },
   "dependencies": {

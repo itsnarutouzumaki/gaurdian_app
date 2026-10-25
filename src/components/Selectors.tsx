@@ -14,14 +14,14 @@ export function YearRibbon({
   onChange: (year: string) => void;
 }) {
   return (
-    <View style={{ gap: 8 }}>
+    <View style={s.yearContainer}>
       <AppText size={11} color={C.muted} weight="semibold">
         ACADEMIC YEAR
       </AppText>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ alignItems: "center", paddingRight: 8 }}
+        contentContainerStyle={s.yearContent}
       >
         {years.map((year) => (
           <Chip
@@ -71,15 +71,15 @@ export function ChoiceModal({
             <AppText
               size={12}
               color={C.muted}
-              style={{ marginTop: 5, marginBottom: 12 }}
+              style={s.helperText}
             >
               {helper}
             </AppText>
           ) : (
-            <View style={{ height: 12 }} />
+            <View style={s.helperSpacer} />
           )}
           <ScrollView
-            style={{ maxHeight: 390 }}
+            style={s.options}
             showsVerticalScrollIndicator={false}
           >
             {options.map((option) => (
@@ -97,12 +97,12 @@ export function ChoiceModal({
                   },
                 ]}
               >
-                <View style={{ flex: 1 }}>
+                <View style={s.choiceContent}>
                   <AppText size={13} weight="semibold">
                     {option.label}
                   </AppText>
                   {option.detail ? (
-                    <AppText size={11} color={C.muted} style={{ marginTop: 3 }}>
+                    <AppText size={11} color={C.muted} style={s.optionDetail}>
                       {option.detail}
                     </AppText>
                   ) : null}
@@ -129,7 +129,7 @@ export function ChoiceModal({
             title="Close"
             variant="outline"
             onPress={onClose}
-            style={{ marginTop: 14 }}
+            style={s.closeButton}
           />
         </View>
       </View>
