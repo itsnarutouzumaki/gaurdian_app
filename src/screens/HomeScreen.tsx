@@ -9,10 +9,10 @@ import {
   Card,
   InfoBanner,
   Page,
-  Photo,
   SchoolMark,
   SectionTitle,
 } from "../components/UI";
+import { SchoolPhotoCarousel } from "../components/SchoolPhotoCarousel";
 import { C } from "../theme";
 import { styles } from "./HomeScreen.styles";
 
@@ -49,7 +49,12 @@ export function HomeScreen() {
   };
   return (
     <Page title={school.name} subtitle="Your family’s school companion" scroll>
-      <Photo uri={school.heroPhotoUrl} height={190} radius={20} />
+      <SchoolPhotoCarousel
+        photos={school.photos}
+        fallbackUri={school.heroPhotoUrl}
+        height={190}
+        radius={20}
+      />
       <Card padding={13} style={styles.schoolCard}>
         <View style={styles.schoolRow}>
           <SchoolMark emoji={school.logoEmoji} size={46} />

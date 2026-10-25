@@ -14,6 +14,7 @@ import {
 } from "../components/UI";
 import { Chip } from "../components/UI";
 import { TeacherListRow } from "../components/TeacherListRow";
+import { SchoolPhotoCarousel } from "../components/SchoolPhotoCarousel";
 import { SCHOOL_DETAILS_TABS } from "../data/screen-options";
 import { C } from "../theme";
 import { styles } from "./SchoolDetailsScreen.styles";
@@ -36,7 +37,12 @@ export function SchoolDetailsScreen() {
       subtitle="Learn about the school community"
       onBack={goBack}
     >
-      <Photo uri={school.heroPhotoUrl} height={190} radius={19} />
+      <SchoolPhotoCarousel
+        photos={school.photos}
+        fallbackUri={school.heroPhotoUrl}
+        height={190}
+        radius={20}
+      />
       <Card padding={14}>
         <View style={styles.schoolHeader}>
           <SchoolMark emoji={school.logoEmoji} size={48} />
