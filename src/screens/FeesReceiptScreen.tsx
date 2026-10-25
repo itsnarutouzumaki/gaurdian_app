@@ -63,7 +63,7 @@ export function FeesReceiptScreen() {
       </Card>
       <Card padding={16}>
         <View style={styles.header}>
-          <SchoolMark emoji={school.logoEmoji} size={48} />
+          <SchoolMark size={48} />
           <AppText
             size={15}
             weight="bold"

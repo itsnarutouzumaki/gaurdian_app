@@ -27,7 +27,6 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  brandMiniText: { color: "#FFFFFF", fontSize: 17 },
   headerText: { flex: 1 },
   headerTitle: { color: "#FFFFFF", fontSize: 15, fontWeight: "700" },
   headerSubtitle: { color: "#D9E8FF", fontSize: 10, marginTop: 1 },

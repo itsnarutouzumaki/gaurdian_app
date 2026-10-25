@@ -45,7 +45,7 @@ export function SchoolDetailsScreen() {
       />
       <Card padding={14}>
         <View style={styles.schoolHeader}>
-          <SchoolMark emoji={school.logoEmoji} size={48} />
+          <SchoolMark size={48} />
           <View style={styles.flex}>
             <AppText size={15} weight="bold">
               {school.name}

@@ -1,7 +1,14 @@
 import React, { useState } from "react";
 import { Alert, Pressable, View } from "react-native";
 import { useApp } from "../app-context";
-import { ActionButton, AppText, Card, Field, Page } from "../components/UI";
+import {
+  ActionButton,
+  AppText,
+  Card,
+  Field,
+  Page,
+  SchoolMark,
+} from "../components/UI";
 import { C } from "../theme";
 import { styles } from "./LoginScreen.styles";
 
@@ -12,11 +19,7 @@ export function LoginScreen() {
   return (
     <Page title="Welcome back" subtitle={school.name} onBack={goBack}>
       <View style={styles.header}>
-        <View style={styles.logoMark}>
-          <AppText size={34} color="#F3D780">
-            {school.logoEmoji || "✦"}
-          </AppText>
-        </View>
+        <SchoolMark size={66} style={styles.logoMark} />
         <AppText size={22} weight="bold" style={styles.title}>
           Login to your account
         </AppText>

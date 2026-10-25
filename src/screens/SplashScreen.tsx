@@ -1,7 +1,13 @@
 import React from "react";
 import { Image, StyleSheet, View } from "react-native";
 import { useApp } from "../app-context";
-import { ActionButton, AppText, Page, Spacer } from "../components/UI";
+import {
+  ActionButton,
+  AppText,
+  Page,
+  SchoolMark,
+  Spacer,
+} from "../components/UI";
 import { C } from "../theme";
 import { styles } from "./SplashScreen.styles";
 
@@ -18,11 +24,7 @@ export function SplashScreen() {
             accessible={false}
           />
           <View style={styles.brandBlock}>
-            <View style={styles.logoMark}>
-              <AppText size={42} color="#F0D47F">
-                {school.logoEmoji || "✦"}
-              </AppText>
-            </View>
+            <SchoolMark size={78} style={styles.logoMark} />
             <AppText
               size={23}
               color="#FFFFFF"

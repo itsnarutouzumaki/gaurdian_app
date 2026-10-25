@@ -17,7 +17,6 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { C, R } from "../theme";
 import { initials } from "../lib/format";
-import config from "../data/school-config.json";
 import { styles } from "./UI.styles";
 
 export function Page({
@@ -53,11 +52,7 @@ export function Page({
               <Text style={styles.backGlyph}>‹</Text>
             </Pressable>
           ) : (
-            <View style={styles.brandMini}>
-              <Text style={styles.brandMiniText}>
-                {config.school.logoEmoji || "✦"}
-              </Text>
-            </View>
+            <SchoolMark size={30} style={styles.brandMini} />
           )}
           <View style={styles.headerText}>
             <Text style={styles.headerTitle}>{title}</Text>
@@ -158,11 +153,11 @@ export function Card({
 }
 
 export function SchoolMark({
-  emoji = "✦",
   size = 48,
+  style,
 }: {
-  emoji?: string;
   size?: number;
+  style?: StyleProp<ViewStyle>;
 }) {
   return (
     <View
@@ -173,11 +168,16 @@ export function SchoolMark({
           height: size,
           borderRadius: size * 0.31,
         },
+        style,
       ]}
     >
-      <AppText size={size * 0.56} color="#F0D47F">
-        {emoji}
-      </AppText>
+      <Image
+        source={require("../../assets/mnnit-logo.png")}
+        resizeMode="contain"
+        accessible
+        accessibilityLabel="MNNIT Allahabad logo"
+        style={{ width: size, height: size }}
+      />
     </View>
   );
 }

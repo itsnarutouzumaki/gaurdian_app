@@ -57,7 +57,7 @@ export function HomeScreen() {
       />
       <Card padding={13} style={styles.schoolCard}>
         <View style={styles.schoolRow}>
-          <SchoolMark emoji={school.logoEmoji} size={46} />
+          <SchoolMark size={46} />
           <View style={styles.flex}>
             <AppText size={15} weight="bold">
               {school.name}
