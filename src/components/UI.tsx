@@ -401,11 +401,15 @@ export function Avatar({
   uri,
   size = 48,
   border = false,
+  fallback = "initials",
+  fallbackColor = C.primary,
 }: {
   name: string;
   uri?: string | null;
   size?: number;
   border?: boolean;
+  fallback?: "initials" | "person";
+  fallbackColor?: string;
 }) {
   const [failed, setFailed] = useState(false);
   useEffect(() => {
@@ -428,13 +432,38 @@ export function Avatar({
         <Image
           source={{ uri }}
           onError={() => setFailed(true)}
+          resizeMode="cover"
           style={{ width: size, height: size, borderRadius: size / 2 }}
         />
       ) : (
-        <AppText size={size * 0.32} color={C.primary} weight="bold">
-          {initials(name)}
-        </AppText>
+        fallback === "person" ? (
+          <PersonIcon color={fallbackColor} size={size} />
+        ) : (
+          <AppText size={size * 0.32} color={fallbackColor} weight="bold">
+            {initials(name)}
+          </AppText>
+        )
       )}
+    </View>
+  );
+}
+
+function PersonIcon({ color, size }: { color: string; size: number }) {
+  return (
+    <View style={[styles.personIcon, { width: size, height: size }]}>
+      <View style={[styles.personHead, { backgroundColor: color }]} />
+      <View style={[styles.personBody, { backgroundColor: color }]} />
+    </View>
+  );
+}
+
+function BellIcon({ color }: { color: string }) {
+  return (
+    <View style={styles.bellIcon}>
+      <View style={[styles.bellTop, { borderColor: color }]} />
+      <View style={[styles.bellBody, { borderColor: color }]} />
+      <View style={[styles.bellRim, { backgroundColor: color }]} />
+      <View style={[styles.bellClapper, { backgroundColor: color }]} />
     </View>
   );
 }
@@ -630,18 +659,21 @@ export function InfoBanner({
 export function BottomTabs({
   active,
   onPress,
+  profileName,
+  profilePhotoUrl,
 }: {
   active: "Home" | "Notifications" | "Profile";
   onPress: (tab: "Home" | "Notifications" | "Profile") => void;
+  profileName: string;
+  profilePhotoUrl: string | null;
 }) {
   const tabs: Array<{
     key: "Home" | "Notifications" | "Profile";
-    icon: string;
     label: string;
   }> = [
-    { key: "Home", icon: "⌂", label: "Home" },
-    { key: "Notifications", icon: "♧", label: "Notifications" },
-    { key: "Profile", icon: "◉", label: "Profile" },
+    { key: "Home", label: "Home" },
+    { key: "Notifications", label: "Notifications" },
+    { key: "Profile", label: "Profile" },
   ];
   return (
     <View style={styles.bottomTabs}>
@@ -651,13 +683,25 @@ export function BottomTabs({
           onPress={() => onPress(tab.key)}
           style={styles.tabButton}
         >
-          <AppText
-            size={22}
-            color={active === tab.key ? C.primary : C.muted}
-            weight="semibold"
-          >
-            {tab.icon}
-          </AppText>
+          {tab.key === "Home" ? (
+            <AppText
+              size={22}
+              color={active === tab.key ? C.primary : C.muted}
+              weight="semibold"
+            >
+              ⌂
+            </AppText>
+          ) : tab.key === "Notifications" ? (
+            <BellIcon color={active === tab.key ? C.primary : C.muted} />
+          ) : (
+            <Avatar
+              name={profileName}
+              uri={profilePhotoUrl}
+              size={22}
+              fallback="person"
+              fallbackColor={active === tab.key ? C.primary : C.muted}
+            />
+          )}
           <AppText
             size={10}
             color={active === tab.key ? C.primary : C.muted}

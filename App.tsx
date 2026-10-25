@@ -263,7 +263,12 @@ export default function App() {
         <View style={styles.app}>
           <View style={styles.screen}>{renderScreen()}</View>
           {showTabs ? (
-            <BottomTabs active={activeTab} onPress={onTabPress} />
+            <BottomTabs
+              active={activeTab}
+              onPress={onTabPress}
+              profileName={guardian.fullName}
+              profilePhotoUrl={guardian.profilePhotoUrl}
+            />
           ) : null}
           {toast ? (
             <View
