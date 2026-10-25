@@ -1,0 +1,94 @@
+{
+  "generatedAt": "2026-10-24T22:40:00+05:30",
+  "generatedOnPlatform": "win32",
+  "projectType": "other",
+  "setup": [
+    {
+      "command": "npm",
+      "args": [
+        "ci"
+      ],
+      "timeoutSeconds": 600
+    }
+  ],
+  "assertions": [
+    {
+      "name": "expo-config-valid",
+      "kind": "process",
+      "command": "npx",
+      "args": [
+        "expo",
+        "config",
+        "--type",
+        "public"
+      ],
+      "verificationMethod": "exit-code",
+      "expected": "0",
+      "timeoutSeconds": 120
+    },
+    {
+      "name": "expo-metro-starts",
+      "kind": "http-probe",
+      "startCommand": "npx",
+      "startArgs": [
+        "expo",
+        "start",
+        "--port",
+        "8081",
+        "--offline"
+      ],
+      "url": "http://localhost:8081/status",
+      "verificationMethod": "http-status",
+      "expected": "200",
+      "timeoutSeconds": 120
+    },
+    {
+      "name": "mock-data-and-branding-valid",
+      "kind": "process",
+      "command": "npm",
+      "args": [
+        "run",
+        "data:check"
+      ],
+      "verificationMethod": "exit-code",
+      "expected": "0",
+      "timeoutSeconds": 60
+    },
+    {
+      "name": "screen-routes-valid",
+      "kind": "process",
+      "command": "npm",
+      "args": [
+        "run",
+        "route:check"
+      ],
+      "verificationMethod": "exit-code",
+      "expected": "0",
+      "timeoutSeconds": 60
+    },
+    {
+      "name": "source-syntax-valid",
+      "kind": "process",
+      "command": "npm",
+      "args": [
+        "run",
+        "syntax:check"
+      ],
+      "verificationMethod": "exit-code",
+      "expected": "0",
+      "timeoutSeconds": 60
+    },
+    {
+      "name": "tests-pass",
+      "kind": "process",
+      "command": "npm",
+      "args": [
+        "run",
+        "logic:check"
+      ],
+      "verificationMethod": "test-results",
+      "expected": "0",
+      "timeoutSeconds": 60
+    }
+  ]
+}

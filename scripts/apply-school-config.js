@@ -1,0 +1,21 @@
+const fs = require('node:fs');
+const path = require('node:path');
+const configPath = path.join(__dirname, '..', 'src', 'data', 'school-config.json');
+const appPath = path.join(__dirname, '..', 'app.json');
+const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+const app = JSON.parse(fs.readFileSync(appPath, 'utf8'));
+const school = config.school;
+const appId = (config.app.appId || config.app.appSlug || school.name)
+  .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'school-family';
+const reverseId = `com.schoolapps.${appId.replace(/-/g, '')}`;
+app.expo.name = config.app.appName || `${school.name} Family`;
+app.expo.slug = appId;
+app.expo.scheme = appId;
+app.expo.backgroundColor = school.theme?.background || school.theme?.bg || app.expo.backgroundColor;
+app.expo.ios = { ...(app.expo.ios || {}), bundleIdentifier: config.app.iosBundleIdentifier || reverseId };
+app.expo.android = { ...(app.expo.android || {}), package: config.app.androidPackage || reverseId, adaptiveIcon: { ...((app.expo.android || {}).adaptiveIcon || {}), backgroundColor: school.theme?.primaryDark || app.expo.android?.adaptiveIcon?.backgroundColor } };
+fs.writeFileSync(appPath, `${JSON.stringify(app, null, 2)}\n`);
+console.log(`Applied branding for ${school.name}`);
+console.log(`App name: ${app.expo.name}`);
+console.log(`Slug: ${app.expo.slug}`);
+console.log('The native launcher name and identifiers change at build time, not while the app is already installed.');

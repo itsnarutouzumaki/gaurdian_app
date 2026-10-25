@@ -1,0 +1,1 @@
+[[{"Pattern":"\u003CStatusBar barStyle=\u0022light-content\u0022 backgroundColor=\\{C\\.primaryDark\\} /\u003E","Replacement":"\u003CStatusBar barStyle=\u0022dark-content\u0022 /\u003E"},{"Pattern":"StyleSheet\\.absoluteFillObject as any","Replacement":"StyleSheet.absoluteFill"}]]

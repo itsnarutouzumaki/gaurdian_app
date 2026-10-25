@@ -1,0 +1,186 @@
+{
+  "planHash": "fb7391c9cbbc6464893b28cdc49598ad3b127c79f5c7d5ad36e52216afd7db27",
+  "phase": "baseline",
+  "recordedAtUtc": "2026-10-24T17:10:07.5091841Z",
+  "retryCount": 0,
+  "resetBaseline": true,
+  "complete": true,
+  "result": {
+    "setupSucceeded": true,
+    "setupDurationMs": 25594,
+    "setupFailureOutput": null,
+    "assertions": [
+      {
+        "name": "expo-config-valid",
+        "kind": "process",
+        "verificationMethod": "exit-code",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": 0,
+        "outputSample": "\r\n{\r\n  name: \u001B[32m\u0027Greenwood International School\u0027\u001B[39m,\r\n  slug: \u001B[32m\u0027greenwood-international-school\u0027\u001B[39m,\r\n  version: \u001B[32m\u00271.0.0\u0027\u001B[39m,\r\n  orientation: \u001B[32m\u0027portrait\u0027\u001B[39m,\r\n  userInterfaceStyle: \u001B[32m\u0027light\u0027\u001B[39m,\r\n  scheme: \u001B[32m\u0027greenwood-international-school\u0027\u001B[39m,\r\n  backgroundColor: \u001B[32m\u0027#F4F7FC\u0027\u001B[39m,\r\n  plugins: [\r\n    \u001B[32m\u0027expo-image-picker\u0027\u001B[39m,\r\n    \u001B[32m\u0027expo-document-picker\u0027\u001B[39m\r\n  ],\r\n  description: \u001B[90mundefined\u001B[39m,\r\n  sdkVersion: \u001B[32m\u002757.0.0\u0027\u001B[39m,\r\n  platforms: [\r\n    \u001B[32m\u0027ios\u0027\u001B[39m,\r\n    \u001B[32m\u0027android\u0027\u001B[39m\r\n  ],\r\n  ios: {\r\n    supportsTablet: \u001B[33mtrue\u001B[39m,\r\n    bundleIdentifier: \u001B[32m\u0027com.greenwoodinternational.guardian\u0027\u001B[39m\r\n  },\r\n  android: {\r\n    package: \u001B[32m\u0027com.greenwoodinternational.guardian\u0027\u001B[39m,\r\n    permissions: [\r\n      \u001B[32m\u0027android.permission.RECORD_AUDIO\u0027\u001B[39m\r\n    ],\r\n    adaptiveIcon: {\r\n      backgroundColor: \u001B[32m\u0027#073C88\u0027\u001B[39m\r\n    }\r\n  }\r\n}\r\n\r\n",
+        "durationMs": 2442
+      },
+      {
+        "name": "expo-metro-starts",
+        "kind": "http-probe",
+        "verificationMethod": "http-status",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": null,
+        "outputSample": "HTTP 200\npackager-status:running\n--- server output ---\nNetworking has been disabled\r\nStarting project at F:\\school App\\guardian-school-app\r\nStarting Metro Bundler\r\n\r\nWaiting on http://localhost:8081\r\n\r\nLogs for your project will appear below.\r\n",
+        "durationMs": 6921
+      },
+      {
+        "name": "mock-data-and-branding-valid",
+        "kind": "process",
+        "verificationMethod": "exit-code",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": 0,
+        "outputSample": "\r\n\u003E greenwood-guardian-app@1.0.0 data:check\r\n\u003E node scripts/check-data.js\r\n\r\nMock data and school-branding checks passed.\r\nSchool: Greenwood International School\r\nChildren: 2 \u00B7 Teachers: 7\r\nAcademic-year records: 8\r\nSubjects: 37\r\nTest/exam records: 192\r\n",
+        "durationMs": 828
+      },
+      {
+        "name": "screen-routes-valid",
+        "kind": "process",
+        "verificationMethod": "exit-code",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": 0,
+        "outputSample": "\r\n\u003E greenwood-guardian-app@1.0.0 route:check\r\n\u003E node scripts/check-routes.js\r\n\r\nRoute map check passed: 23 registered screens; literal navigation targets are valid.\r\n",
+        "durationMs": 831
+      },
+      {
+        "name": "source-syntax-valid",
+        "kind": "process",
+        "verificationMethod": "exit-code",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": 0,
+        "outputSample": "\r\n\u003E greenwood-guardian-app@1.0.0 syntax:check\r\n\u003E node scripts/check-source-syntax.js\r\n\r\nSource syntax and local imports passed for 17 TypeScript files.\r\n",
+        "durationMs": 1629
+      },
+      {
+        "name": "tests-pass",
+        "kind": "process",
+        "verificationMethod": "test-results",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": 0,
+        "outputSample": "\r\n\u003E greenwood-guardian-app@1.0.0 logic:check\r\n\u003E node scripts/check-logic.js\r\n\r\nLogic checks passed: profile completion, leave date validation, calendar construction, INR formatting, historical teacher mapping.\r\n",
+        "durationMs": 1316,
+        "testResults": {
+          "testFramework": "unknown",
+          "runnerDetectedFrom": "none",
+          "testsTotal": 0,
+          "testsPassed": 0,
+          "testsFailed": 0,
+          "testsSkipped": 0,
+          "parseFailed": true
+        }
+      }
+    ],
+    "executions": [
+      {
+        "source": "setup[0]",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.CMD",
+        "args": [
+          "ci"
+        ],
+        "cwd": "F:\\school App\\guardian-school-app",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      },
+      {
+        "source": "expo-config-valid",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npx.CMD",
+        "args": [
+          "expo",
+          "config",
+          "--type",
+          "public"
+        ],
+        "cwd": "F:\\school App\\guardian-school-app",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      },
+      {
+        "source": "expo-metro-starts",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npx.CMD",
+        "args": [
+          "expo",
+          "start",
+          "--port",
+          "8081",
+          "--offline"
+        ],
+        "cwd": "F:\\school App\\guardian-school-app",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      },
+      {
+        "source": "mock-data-and-branding-valid",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.CMD",
+        "args": [
+          "run",
+          "data:check"
+        ],
+        "cwd": "F:\\school App\\guardian-school-app",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      },
+      {
+        "source": "screen-routes-valid",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.CMD",
+        "args": [
+          "run",
+          "route:check"
+        ],
+        "cwd": "F:\\school App\\guardian-school-app",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      },
+      {
+        "source": "source-syntax-valid",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.CMD",
+        "args": [
+          "run",
+          "syntax:check"
+        ],
+        "cwd": "F:\\school App\\guardian-school-app",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      },
+      {
+        "source": "tests-pass",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.CMD",
+        "args": [
+          "run",
+          "logic:check"
+        ],
+        "cwd": "F:\\school App\\guardian-school-app",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      }
+    ]
+  }
+}

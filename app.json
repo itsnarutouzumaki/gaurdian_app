@@ -1,0 +1,25 @@
+{
+  "expo": {
+    "name": "Greenwood International School",
+    "slug": "greenwood-international-school",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "scheme": "greenwood-international-school",
+    "backgroundColor": "#F4F7FC",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.greenwoodinternational.guardian"
+    },
+    "android": {
+      "package": "com.greenwoodinternational.guardian",
+      "adaptiveIcon": {
+        "backgroundColor": "#0c010f"
+      }
+    },
+    "plugins": [
+      "expo-image-picker",
+      "expo-document-picker"
+    ]
+  }
+}
