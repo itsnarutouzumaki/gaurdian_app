@@ -37,11 +37,13 @@ const assetEntry = new RegExp(`["']${escapedAssetKey}["']\\s*:\\s*require\\(["']
 ok(assetEntry, `No statically bundled image is registered for ${media.logo.assetKey}`);
 ok(fs.existsSync(path.resolve(schoolRoot, assetEntry[1])), `Bundled school logo file is missing: ${assetEntry[1]}`);
 if (app.icon) ok(fs.existsSync(path.join(root, app.icon)), `Configured app icon is missing: ${app.icon}`);
-ok(Boolean(appConfig.icon) === Boolean(app.icon), 'app.json icon does not match the active school configuration');
+ok(Boolean(app.icon), 'The active school needs a configured launcher icon');
+ok(appConfig.icon === app.icon, 'app.json icon does not match the active school configuration');
+ok(Boolean(app.android.adaptiveIcon.foregroundImage), 'The active school needs a configured Android adaptive icon');
 if (app.android.adaptiveIcon.foregroundImage) {
   ok(fs.existsSync(path.join(root, app.android.adaptiveIcon.foregroundImage)), `Configured Android adaptive icon is missing: ${app.android.adaptiveIcon.foregroundImage}`);
 }
-ok(Boolean(appConfig.android.adaptiveIcon.foregroundImage) === Boolean(app.android.adaptiveIcon.foregroundImage), 'Android adaptive icon does not match the active school configuration');
+ok(appConfig.android.adaptiveIcon.foregroundImage === app.android.adaptiveIcon.foregroundImage, 'Android adaptive icon does not match the active school configuration');
 const splashPlugin = appConfig.plugins.find(
   plugin => (Array.isArray(plugin) ? plugin[0] : plugin) === 'expo-splash-screen',
 );
@@ -54,6 +56,7 @@ ok(splashOptions?.backgroundColor === theme.light.primaryDark, 'Android splash b
 ok(app.splash.android.backgroundColor === theme.light.primaryDark, 'Configured Android splash color must match school primaryDark');
 ok(fs.existsSync(path.join(root, app.splash.android.image)), `Configured Android splash image is missing: ${app.splash.android.image}`);
 ok(Number.isFinite(app.splash.android.imageWidth) && app.splash.android.imageWidth > 0, 'Android splash image width must be a positive number');
+ok(appConfig.plugins.some(plugin => (Array.isArray(plugin) ? plugin[0] : plugin) === 'expo-notifications'), 'Expo notifications plugin is not configured');
 
 ok(data.guardian, 'guardian mock profile is missing');
 for (const key of ['fullName', 'mobileNumber', 'email', 'profilePhotoUrl']) ok(key in data.guardian, `guardian.${key} is missing`);

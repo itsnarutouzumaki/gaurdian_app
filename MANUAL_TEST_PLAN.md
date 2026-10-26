@@ -8,6 +8,7 @@ Run the app with `npm install`, `npx expo install --fix`, then `npm start`. Thes
 - [ ] Demo login accepts any non-empty mobile number and password; this is intentionally not real authentication.
 - [ ] Home, Notifications and Profile bottom tabs replace the current tab stack without duplicating screens.
 - [ ] Logout opens a confirmation dialog. Cancel keeps the session; Logout returns to Login.
+- [ ] On Android, Back dismisses the logout dialog first, pops a nested screen, returns Profile/Notifications roots to Home, and exits from root Home/Login.
 
 ## 2. Home and linked children
 
@@ -63,3 +64,12 @@ Run the app with `npm install`, `npx expo install --fix`, then `npm start`. Thes
 - [ ] Change Password validates empty fields, minimum length, difference from the current password and confirmation matching. It explicitly states no real password changes in this UI demo.
 - [ ] Help & Support search filters FAQs and school contact actions display the configured contact details.
 - [ ] Terms & Conditions and Privacy Policy show illustrative demo content.
+- [ ] The Language row offers native labels “English” and “हिन्दी”; selecting either updates translated UI and remains selected after a restart.
+
+## 9. Android branding, notifications and package size
+
+- [ ] Build and install a fresh Android APK after changing `app-config.json`; confirm the launcher uses the configured provisional GI monogram and the launch screen uses the configured splash logo on `#073C88`.
+- [ ] Confirm the provisional icon is replaced with approved Greenwood artwork before any production release.
+- [ ] The app can process an Expo notification tap whose data includes an allowed `route`; invalid routes and unknown child IDs must not navigate. Production delivery/token registration is not testable until an authenticated backend is configured.
+- [ ] Verify the local toast overlay remains separate from system push notifications.
+- [ ] Record the built release APK/AAB size from the actual build artifact and attach the artifact/build variant to the audit. Do not infer package size from source assets or installed npm modules.

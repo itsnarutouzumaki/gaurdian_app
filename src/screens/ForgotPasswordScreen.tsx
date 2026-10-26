@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { Alert } from "react-native";
-import { useApp } from "../app-context";
+import { useApp, useAppAlert } from "../app-context";
 import { ActionButton, AppText, Card, Field, Page } from "../components/UI";
 import { C } from "../theme";
 import { styles } from "./ForgotPasswordScreen.styles";
 
 export function ForgotPasswordScreen() {
+  const Alert = useAppAlert();
   const { navigate, goBack } = useApp();
   const [mobile, setMobile] = useState("");
   return (

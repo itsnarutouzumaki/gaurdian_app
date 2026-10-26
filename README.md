@@ -54,7 +54,7 @@ The login form is prefilled with sample details. Any non-empty mobile number and
 
 - `active-school.json` selects the school by ID.
 - `<school-id>/school.json` contains the school identity, contact/About information, facilities and academic-year options.
-- `<school-id>/app-config.json` contains Expo app identity, native package identifiers and Android splash settings. Launcher icon paths are optional and remain unset until supplied.
+- `<school-id>/app-config.json` contains Expo app identity, native package identifiers, launcher icon paths and Android splash settings. The current Greenwood launcher icon is a provisional blue-and-white “GI” monogram; replace it with approved school artwork before release.
 - `<school-id>/theme.json` contains the default appearance mode and semantic palettes. The dark palette is `null` until real dark-mode colors are provided.
 - `<school-id>/media.json` contains the configured cover image, ordered gallery, videos and logo metadata.
 - `<school-id>/teachers.json` is the canonical teacher directory. Historical teacher IDs referenced by academic records remain unchanged.
@@ -71,7 +71,7 @@ To apply the selected school’s app identity and appearance to native metadata 
 npm run config:apply
 ```
 
-Native launcher name, bundle ID, package name, icon and launch screen are build-time configuration. They cannot change on a device merely because JSON changed inside an installed app. The `expo-splash-screen` plugin uses the selected school’s Android splash image, width, resize mode and background color; changing these settings requires a new native build. The logo in `media.json` is a school UI logo and is not used as a launcher icon. The currently configured school and launch logo is the MNNIT logo selected by the user; the school gallery and video thumbnails are existing HTTPS demo URLs.
+Native launcher name, bundle ID, package name, icon and launch screen are build-time configuration. They cannot change on a device merely because JSON changed inside an installed app. The `expo-splash-screen` plugin uses the selected school’s Android splash image, width, resize mode and background color; changing these settings requires a new native build. The logo in `media.json` is a school UI logo and is not used as a launcher icon. The current splash screen retains the MNNIT logo previously authorized for this prototype; the launcher uses a separate provisional GI icon, not the MNNIT logo. The school gallery and video thumbnails are existing HTTPS demo URLs.
 
 ### `scripts/generate-mock-data.py`
 
@@ -102,10 +102,22 @@ The PDF buttons **do not render a PDF inside the app**. They generate a sample P
 ```bash
 npm run data:check
 npm run typecheck
+npm test
 npm run verify
 ```
 
-`data:check` verifies the selected school configuration, synchronized Expo identity, unique student IDs, academic years, teacher references, test marks, fee records, child references and the rule that subject-level overview records do not contain marks or question-wise marks. TypeScript is checked with `tsc` once npm dependencies are installed.
+`data:check` verifies the selected school configuration, synchronized Expo identity and launcher assets, unique student IDs, academic years, teacher references, test marks, fee records, child references and the rule that subject-level overview records do not contain marks or question-wise marks. `npm test` runs the logic and localization checks; `npm run verify` also checks routes, syntax, static styles and TypeScript.
+
+## Language, Android Back and notifications
+
+- English and Hindi are available from the Language row on My Profile. The app uses `i18next` / `react-i18next`, starts from the device language when supported, and stores a user selection locally with AsyncStorage. Untranslated dynamic/user-provided strings remain unchanged.
+- Android Back dismisses the logout dialog, pops an in-app screen, returns a root Profile/Notifications screen to Home, or exits from root Home/Login.
+- The Expo Notifications client configures the Android channel, handles foreground notifications and routes validated notification taps. This repository has no authenticated production login or notification backend, so it does not request/register a device token or claim server delivery. `registerPushTokenWithBackend` is an adapter for a future authenticated HTTPS `POST /v1/device-tokens` service; it requires a real access token and must be called from the production authentication flow. The request body is `{ "token": "<Expo push token>", "platform": "android" | "ios" }`; the service must authenticate the bearer token, associate the token with that authenticated guardian, and return a 2xx status on success. No access token or backend URL is bundled in the demo.
+- The app’s toast overlay is local UI feedback; it is separate from operating-system push notifications.
+
+## Android package-size audit
+
+No APK or AAB is checked into this workspace, so installed/package size and per-module size savings have not been measured. The final Expo Android export produced a 2,192,499-byte Hermes JavaScript bundle (Expo reports 2.2 MB) and one 38,781-byte school image. These are only bundle/export figures, not the final APK/AAB or installed size. Measure the release APK/AAB from the actual Android build pipeline before reporting a size target or savings; do not use the JavaScript dependency tree or raw asset sizes as a substitute for the packaged artifact.
 
 ## Limitations (intentional for the requested scope)
 

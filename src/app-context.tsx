@@ -1,4 +1,6 @@
 import React, { createContext, useContext } from "react";
+import { Alert } from "react-native";
+import type { Language } from "./lib/i18n";
 import type {
   ChildRecord,
   ComplaintRecord,
@@ -48,12 +50,24 @@ export type AppContextValue = {
   logoutDialogVisible: boolean;
   setLogoutDialogVisible: (visible: boolean) => void;
   signIn: () => void;
+  language: Language;
+  setLanguage: (language: Language) => Promise<void>;
+  alert: (...args: Parameters<typeof Alert.alert>) => void;
 };
 
 const Ctx = createContext<AppContextValue | null>(null);
+const LanguageCtx = createContext<Language>("en");
 export const AppProvider = Ctx.Provider;
+export const LanguageProvider = LanguageCtx.Provider;
+export function useLanguage() {
+  return useContext(LanguageCtx);
+}
 export function useApp() {
   const value = useContext(Ctx);
   if (!value) throw new Error("useApp must be used inside AppProvider");
   return value;
+}
+
+export function useAppAlert() {
+  return { alert: useApp().alert };
 }

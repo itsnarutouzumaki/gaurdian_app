@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Alert, View } from "react-native";
-import { useApp } from "../app-context";
+import { View } from "react-native";
+import { useApp, useAppAlert } from "../app-context";
 import {
   ActionButton,
   AppText,
@@ -16,6 +16,7 @@ import type { HelpTopic } from "../types";
 import { styles } from "./HelpSupportScreen.styles";
 
 export function HelpSupportScreen() {
+  const Alert = useAppAlert();
   const { navigate, goBack, school } = useApp();
   const topics: HelpTopic[] = mock.helpTopics;
   const [opened, setOpened] = useState<string | null>(null);

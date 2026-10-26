@@ -63,14 +63,11 @@ app.expo.android = {
   package: config.android.package,
   adaptiveIcon: {
     ...((app.expo.android || {}).adaptiveIcon || {}),
+    foregroundImage: config.android.adaptiveIcon.foregroundImage,
     backgroundColor: config.android.adaptiveIcon.backgroundColor,
   },
 };
-if (config.icon) app.expo.icon = config.icon;
-else delete app.expo.icon;
-if (config.android.adaptiveIcon.foregroundImage) {
-  app.expo.android.adaptiveIcon.foregroundImage = config.android.adaptiveIcon.foregroundImage;
-} else delete app.expo.android.adaptiveIcon.foregroundImage;
+app.expo.icon = config.icon;
 
 fs.writeFileSync(appPath, `${JSON.stringify(app, null, 2)}\n`);
 console.log(`Applied branding for ${school.name}`);

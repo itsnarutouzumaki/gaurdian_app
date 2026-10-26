@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Alert, Pressable } from "react-native";
-import { useApp } from "../app-context";
+import { Pressable } from "react-native";
+import { useApp, useAppAlert } from "../app-context";
 import {
   ActionButton,
   AppText,
@@ -14,6 +14,7 @@ import { InfoDemo } from "./LoginScreen";
 import { styles } from "./SignUpScreen.styles";
 
 export function SignUpScreen() {
+  const Alert = useAppAlert();
   const { school, navigate, signIn, goBack } = useApp();
   const [name, setName] = useState("");
   const [mobile, setMobile] = useState("");

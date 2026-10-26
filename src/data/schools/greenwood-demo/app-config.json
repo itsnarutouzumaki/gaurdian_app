@@ -7,7 +7,7 @@
   "android": {
     "package": "com.greenwoodinternational.guardian",
     "adaptiveIcon": {
-      "foregroundImage": null,
+      "foregroundImage": "./assets/greenwood-guardian-adaptive.png",
       "backgroundColor": "#073C88"
     }
   },
@@ -22,5 +22,5 @@
   "ios": {
     "bundleIdentifier": "com.greenwoodinternational.guardian"
   },
-  "icon": null
+  "icon": "./assets/greenwood-guardian-icon.png"
 }

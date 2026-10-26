@@ -15,6 +15,9 @@ import {
   ViewStyle,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useLanguage } from "../app-context";
+import { translate } from "../lib/i18n";
+import { useTranslation } from "react-i18next";
 import { C, R } from "../theme";
 import { initials } from "../lib/format";
 import { getActiveSchoolConfig } from "../data/schools/registry";
@@ -39,6 +42,8 @@ export function Page({
   scroll?: boolean;
   contentStyle?: StyleProp<ViewStyle>;
 }) {
+  const language = useLanguage();
+  const { t } = useTranslation();
   const content = (
     <View style={[styles.pageContent, contentStyle]}>{children}</View>
   );
@@ -49,7 +54,7 @@ export function Page({
           {onBack ? (
             <Pressable
               onPress={onBack}
-              accessibilityLabel="Go back"
+              accessibilityLabel={translate("Go back", language)}
               style={styles.backButton}
             >
               <Text style={styles.backGlyph}>‹</Text>
@@ -58,9 +63,13 @@ export function Page({
             <SchoolMark size={30} style={styles.brandMini} />
           )}
           <View style={styles.headerText}>
-            <Text style={styles.headerTitle}>{title}</Text>
+            <Text style={styles.headerTitle}>
+              {t(title, { defaultValue: translate(title, language) })}
+            </Text>
             {subtitle ? (
-              <Text style={styles.headerSubtitle}>{subtitle}</Text>
+              <Text style={styles.headerSubtitle}>
+                {translate(subtitle, language)}
+              </Text>
             ) : null}
           </View>
           {right || <View style={styles.rightPlaceholder} />}
@@ -100,6 +109,8 @@ export function AppText({
   align?: "left" | "center" | "right";
   lineHeight?: number;
 }) {
+  const language = useLanguage();
+  const { t } = useTranslation();
   const fontWeight =
     weight === "medium"
       ? "500"
@@ -122,7 +133,9 @@ export function AppText({
         style,
       ]}
     >
-      {children}
+      {typeof children === "string"
+        ? t(children, { defaultValue: translate(children, language) })
+        : children}
     </Text>
   );
 }
@@ -343,6 +356,7 @@ export function Field({
   maxLength?: number;
   autoCapitalize?: "none" | "sentences" | "words" | "characters";
 }) {
+  const language = useLanguage();
   return (
     <View style={styles.field}>
       <AppText
@@ -371,7 +385,7 @@ export function Field({
           value={value}
           onChangeText={onChangeText}
           maxLength={maxLength}
-          placeholder={placeholder || ""}
+          placeholder={translate(placeholder || "", language)}
           placeholderTextColor="#9AA7B8"
           editable={editable}
           multiline={multiline}

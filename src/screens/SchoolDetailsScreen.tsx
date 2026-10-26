@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Alert, Linking, Pressable, ScrollView, View } from "react-native";
-import { useApp } from "../app-context";
+import { Linking, Pressable, ScrollView, View } from "react-native";
+import { useApp, useAppAlert } from "../app-context";
 import {
   ActionButton,
   AppText,
@@ -20,6 +20,7 @@ import { C } from "../theme";
 import { styles } from "./SchoolDetailsScreen.styles";
 
 export function SchoolDetailsScreen() {
+  const Alert = useAppAlert();
   const {
     school,
     media,

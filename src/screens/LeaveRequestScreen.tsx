@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
-import { Alert, Pressable, View } from "react-native";
-import { useApp } from "../app-context";
+import { Pressable, View } from "react-native";
+import { useApp, useAppAlert } from "../app-context";
 import {
   ActionButton,
   AppText,
@@ -21,6 +21,7 @@ import { C } from "../theme";
 import { styles } from "./LeaveRequestScreen.styles";
 
 export function LeaveRequestScreen() {
+  const Alert = useAppAlert();
   const {
     children,
     selectedChildId,

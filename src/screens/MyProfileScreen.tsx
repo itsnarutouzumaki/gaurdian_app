@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { Pressable, View } from "react-native";
 import { useApp } from "../app-context";
+import { ChoiceModal } from "../components/Selectors";
 import {
   AppText,
   Avatar,
@@ -16,7 +17,17 @@ import { PROFILE_MENU_OPTIONS } from "../data/screen-options";
 import { styles } from "./MyProfileScreen.styles";
 
 export function MyProfileScreen() {
-  const { guardian, school, navigate, setLogoutDialogVisible } = useApp();
+  const {
+    guardian,
+    school,
+    navigate,
+    setLogoutDialogVisible,
+    language,
+    setLanguage,
+    showToast,
+    alert,
+  } = useApp();
+  const [languagePicker, setLanguagePicker] = useState(false);
   return (
     <Page title="My Profile" subtitle="Account and preferences">
       <Card padding={16}>
@@ -84,6 +95,32 @@ export function MyProfileScreen() {
             {index < PROFILE_MENU_OPTIONS.length - 1 ? (
               <Divider space={1} />
             ) : null}
+            {index === 1 ? (
+              <>
+                <Pressable
+                  onPress={() => setLanguagePicker(true)}
+                  style={styles.menuRow}
+                >
+                  <View style={[styles.menuIcon, { backgroundColor: C.blueSoft }]}>
+                    <AppText size={22} color={C.primary} weight="semibold">
+                      文
+                    </AppText>
+                  </View>
+                  <View style={styles.flex}>
+                    <AppText size={13} weight="semibold">
+                      Language
+                    </AppText>
+                    <AppText size={10} color={C.muted} style={styles.detail}>
+                      {language === "hi" ? "हिन्दी" : "English"}
+                    </AppText>
+                  </View>
+                  <AppText size={23} color={C.muted}>
+                    ›
+                  </AppText>
+                </Pressable>
+                <Divider space={1} />
+              </>
+            ) : null}
           </View>
         ))}
         <Divider space={1} />
@@ -112,6 +149,28 @@ export function MyProfileScreen() {
       <AppText size={10} color={C.muted} align="center">
         {school.name} · Demo UI 1.0.0
       </AppText>
+      <ChoiceModal
+        visible={languagePicker}
+        title="Choose app language"
+        options={[
+          { label: "English", value: "en" },
+          { label: "हिन्दी", value: "hi" },
+        ]}
+        selected={language}
+        onClose={() => setLanguagePicker(false)}
+        onSelect={(value) => {
+          if (value !== "en" && value !== "hi") return;
+          void setLanguage(value)
+            .then(() => showToast({ title: "Language preference saved.", tone: "success" }))
+            .catch((error: unknown) => {
+              console.error("Unable to save the language preference.", error);
+              alert(
+                "Language preference",
+                "Unable to save language preference.",
+              );
+            });
+        }}
+      />
     </Page>
   );
 }

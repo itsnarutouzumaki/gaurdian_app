@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { Alert, Pressable, View } from "react-native";
+import { Pressable, View } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
-import { useApp } from "../app-context";
+import { useApp, useAppAlert } from "../app-context";
 import {
   ActionButton,
   AppText,
@@ -20,6 +20,7 @@ import { C } from "../theme";
 import { styles } from "./RaiseComplaintScreen.styles";
 
 export function RaiseComplaintScreen() {
+  const Alert = useAppAlert();
   const {
     children,
     selectedChildId,

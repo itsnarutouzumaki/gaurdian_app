@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { Alert, Pressable, View } from "react-native";
+import { Pressable, View } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import { useApp } from "../app-context";
+import { useApp, useAppAlert } from "../app-context";
 import {
   ActionButton,
   AppText,
@@ -16,6 +16,7 @@ import { SAMPLE_PROFILE_PHOTOS } from "../data/screen-options";
 import { styles } from "./EditProfileScreen.styles";
 
 export function EditProfileScreen() {
+  const Alert = useAppAlert();
   const {
     guardian,
     setGuardian,

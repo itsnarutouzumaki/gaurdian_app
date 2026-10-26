@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { Alert, View } from "react-native";
-import { useApp } from "../app-context";
+import { View } from "react-native";
+import { useApp, useAppAlert } from "../app-context";
 import { ActionButton, AppText, Card, Field, InfoBanner, Page } from "../components/UI";
 import { C } from "../theme";
 import { styles } from "./ChangePasswordScreen.styles";
 
 export function ChangePasswordScreen() {
+  const Alert = useAppAlert();
   const { goBack, showToast } = useApp();
   const [current, setCurrent] = useState("");
   const [next, setNext] = useState("");

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Alert, Pressable, View } from "react-native";
-import { useApp } from "../app-context";
+import { Pressable, View } from "react-native";
+import { useApp, useAppAlert } from "../app-context";
 import {
   ActionButton,
   AppText,
@@ -13,6 +13,7 @@ import { C } from "../theme";
 import { styles } from "./LoginScreen.styles";
 
 export function LoginScreen() {
+  const Alert = useAppAlert();
   const { school, navigate, signIn, goBack } = useApp();
   const [mobile, setMobile] = useState("9876543210");
   const [password, setPassword] = useState("Demo@123");

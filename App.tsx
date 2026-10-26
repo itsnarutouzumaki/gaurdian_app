@@ -1,10 +1,22 @@
-import React, { useCallback, useMemo, useState } from "react";
-import { Alert, StatusBar, View } from "react-native";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Alert, BackHandler, Platform, StatusBar, View } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { isRunningInExpoGo } from "expo";
+import { getLocales } from "expo-localization";
+import type * as Notifications from "expo-notifications";
+import * as ExpoSplashScreen from "expo-splash-screen";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { AppProvider } from "./src/app-context";
+import { AppProvider, LanguageProvider } from "./src/app-context";
 import type { AppContextValue } from "./src/app-context";
 import mock from "./src/data/mock-data.json";
 import { getActiveSchoolConfig } from "./src/data/schools/registry";
+import { getHardwareBackDecision } from "./src/lib/back-navigation";
+import { i18n, translate, type Language } from "./src/lib/i18n";
+import { configurePushChannel } from "./src/lib/push-notifications";
+import {
+  parsePushTapPayload,
+  type PushTapPayload,
+} from "./src/lib/push-payload";
 import type {
   ComplaintRecord,
   GuardianProfile,
@@ -51,10 +63,19 @@ import { TeacherProfileScreen } from "./src/screens/TeacherProfileScreen";
 const seed = mock;
 const schoolConfig = getActiveSchoolConfig();
 const children = seed.children;
+const languageStorageKey = "guardian-app.language";
+
+void ExpoSplashScreen.preventAutoHideAsync().catch((error: unknown) => {
+  console.error("Unable to keep the native splash visible while loading preferences.", error);
+});
 
 export default function App() {
   const [stack, setStack] = useState<Route[]>([{ name: "Splash" }]);
   const [authenticated, setAuthenticated] = useState(false);
+  const [language, setLanguageState] = useState<Language>(() =>
+    getLocales()[0]?.languageCode === "hi" ? "hi" : "en",
+  );
+  const [preferencesReady, setPreferencesReady] = useState(false);
   const [guardian, setGuardian] = useState<GuardianProfile>(() => ({
     ...seed.guardian,
   }));
@@ -82,6 +103,8 @@ export default function App() {
   );
   const [toast, setToast] = useState<ToastMessage | null>(null);
   const [logoutDialogVisible, setLogoutDialogVisible] = useState(false);
+  const pendingPushRoute = useRef<PushTapPayload | null>(null);
+  const handledPushResponses = useRef(new Set<string>());
   const currentRoute = stack[stack.length - 1] || {
     name: "Splash" as ScreenName,
   };
@@ -113,15 +136,196 @@ export default function App() {
       3200,
     );
   }, []);
+  const setLanguage = useCallback(async (nextLanguage: Language) => {
+    await AsyncStorage.setItem(languageStorageKey, nextLanguage);
+    await i18n.changeLanguage(nextLanguage);
+    setLanguageState(nextLanguage);
+  }, []);
+  const showAlert = useCallback(
+    (...args: Parameters<typeof Alert.alert>) => {
+      const [title, message, buttons, options] = args;
+      Alert.alert(
+        translate(title ?? "", language),
+        message ? translate(message, language) : undefined,
+        buttons?.map((button) => ({
+          ...button,
+          text: button.text ? translate(button.text, language) : undefined,
+        })),
+        options,
+      );
+    },
+    [language],
+  );
   const changeChild = useCallback((id: string) => {
     setSelectedChildIdState(id);
     const child = children.find((item) => item.id === id);
     if (child) setSelectedYear(child.currentAcademicYear);
   }, []);
+  const openPushRoute = useCallback(
+    (payload: PushTapPayload) => {
+      if (payload.childId) {
+        if (!children.some((child) => child.id === payload.childId)) return;
+        changeChild(payload.childId);
+      }
+      if (authenticated) {
+        setStack((previous) => [
+          ...previous,
+          {
+            name: payload.route,
+            ...(payload.childId ? { params: { childId: payload.childId } } : {}),
+          },
+        ]);
+      } else {
+        pendingPushRoute.current = payload;
+        setStack([{ name: "Login" }]);
+      }
+    },
+    [authenticated, changeChild],
+  );
+  const openPushRouteRef = useRef(openPushRoute);
   const signIn = useCallback(() => {
     setAuthenticated(true);
-    setStack([{ name: "Home" }]);
+    const pending = pendingPushRoute.current;
+    pendingPushRoute.current = null;
+    setStack([
+      { name: "Home" },
+      ...(pending ? [{ name: pending.route, ...(pending.childId ? { params: { childId: pending.childId } } : {}) }] : []),
+    ]);
   }, []);
+  useEffect(() => {
+    let active = true;
+    AsyncStorage.getItem(languageStorageKey)
+      .then(async (savedLanguage) => {
+        if (active && (savedLanguage === "en" || savedLanguage === "hi")) {
+          await i18n.changeLanguage(savedLanguage);
+          setLanguageState(savedLanguage);
+        } else if (active) {
+          await i18n.changeLanguage(language);
+        }
+      })
+      .catch((error: unknown) => {
+        console.error("Unable to load the saved language preference.", error);
+      })
+      .finally(() => {
+        if (active) setPreferencesReady(true);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+  useEffect(() => {
+    if (!preferencesReady) return;
+    ExpoSplashScreen.hideAsync().catch((error: unknown) => {
+      console.error("Unable to hide the native splash screen.", error);
+    });
+  }, [preferencesReady]);
+  useEffect(() => {
+    openPushRouteRef.current = openPushRoute;
+  }, [openPushRoute]);
+  useEffect(() => {
+    if (isRunningInExpoGo()) return;
+    let active = true;
+    let received: { remove: () => void } | undefined;
+    let responseSubscription: { remove: () => void } | undefined;
+
+    const openNotification = (response: Notifications.NotificationResponse) => {
+      const responseId = response.notification.request.identifier;
+      if (handledPushResponses.current.has(responseId)) return;
+      handledPushResponses.current.add(responseId);
+      const payload = parsePushTapPayload(
+        response.notification.request.content.data,
+      );
+      if (payload) openPushRouteRef.current(payload);
+    };
+
+    void import("expo-notifications")
+      .then(async (Notifications) => {
+        if (!active) return;
+        Notifications.setNotificationHandler({
+          handleNotification: async () => ({
+            shouldPlaySound: true,
+            shouldSetBadge: false,
+            shouldShowBanner: true,
+            shouldShowList: true,
+          }),
+        });
+        if (Platform.OS === "android") await configurePushChannel();
+        if (!active) return;
+        received = Notifications.addNotificationReceivedListener((notification) => {
+          const { request } = notification;
+          const content = request.content;
+          setNotifications((previous) => {
+            if (previous.some((item) => item.id === request.identifier)) return previous;
+            const data = content.data as Record<string, unknown>;
+            const type =
+              data.type === "request" ||
+              data.type === "complaint" ||
+              data.type === "fee" ||
+              data.type === "result"
+                ? data.type
+                : "update";
+            return [
+              {
+                id: request.identifier,
+                type,
+                title: content.title || "Notifications",
+                message: content.body || "",
+                dateLabel: "Just now",
+                read: false,
+                ...(typeof data.childId === "string" ? { childId: data.childId } : {}),
+              },
+              ...previous,
+            ];
+          });
+        });
+        responseSubscription =
+          Notifications.addNotificationResponseReceivedListener(openNotification);
+        const response = await Notifications.getLastNotificationResponseAsync();
+        if (active && response) openNotification(response);
+      })
+      .catch((error: unknown) => {
+        console.error("Unable to initialize push notification handling.", error);
+      });
+
+    return () => {
+      active = false;
+      received?.remove();
+      responseSubscription?.remove();
+    };
+  }, []);
+  useEffect(() => {
+    const subscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      () => {
+        const decision = getHardwareBackDecision({
+          stackLength: stack.length,
+          route: currentRoute.name,
+          authenticated,
+          modalVisible: logoutDialogVisible,
+        });
+        if (decision === "exit") return false;
+        if (decision === "dismiss-modal") {
+          setLogoutDialogVisible(false);
+        } else if (decision === "pop") {
+          goBack();
+        } else if (authenticated) {
+          resetTo("Home");
+        } else {
+          replace("Login");
+        }
+        return true;
+      },
+    );
+    return () => subscription.remove();
+  }, [
+    authenticated,
+    currentRoute.name,
+    goBack,
+    logoutDialogVisible,
+    replace,
+    resetTo,
+    stack.length,
+  ]);
   const value: AppContextValue = useMemo(
     () => ({
       school: schoolConfig.school,
@@ -157,6 +361,9 @@ export default function App() {
       logoutDialogVisible,
       setLogoutDialogVisible,
       signIn,
+      language,
+      setLanguage,
+      alert: showAlert,
     }),
     [
       guardian,
@@ -178,6 +385,9 @@ export default function App() {
       logoutDialogVisible,
       signIn,
       changeChild,
+      language,
+      setLanguage,
+      showAlert,
     ],
   );
 
@@ -257,8 +467,17 @@ export default function App() {
     }
   };
 
+  if (!preferencesReady) {
+    return (
+      <SafeAreaProvider>
+        <View style={styles.app} />
+      </SafeAreaProvider>
+    );
+  }
+
   return (
     <SafeAreaProvider>
+      <LanguageProvider value={language}>
       <AppProvider value={value}>
         <StatusBar barStyle="dark-content" />
         <View style={styles.app}>
@@ -329,6 +548,7 @@ export default function App() {
           </ModalFrame>
         </View>
       </AppProvider>
+      </LanguageProvider>
     </SafeAreaProvider>
   );
 }

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Alert, ScrollView, View } from "react-native";
-import { useApp } from "../app-context";
+import { ScrollView, View } from "react-native";
+import { useApp, useAppAlert } from "../app-context";
 import {
   ActionButton,
   AppText,
@@ -18,6 +18,7 @@ import { C } from "../theme";
 import { styles } from "./TeacherProfileScreen.styles";
 
 export function TeacherProfileScreen() {
+  const Alert = useAppAlert();
   const { teachers, selectedTeacherId, goBack, school } = useApp();
   const teacher = getTeacher(teachers, selectedTeacherId);
   const [tab, setTab] = useState("About");
