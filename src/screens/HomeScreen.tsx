@@ -19,6 +19,7 @@ import { styles } from "./HomeScreen.styles";
 export function HomeScreen() {
   const {
     school,
+    media,
     guardian,
     children,
     navigate,
@@ -50,8 +51,8 @@ export function HomeScreen() {
   return (
     <Page title={school.name} subtitle="Your family’s school companion" scroll>
       <SchoolPhotoCarousel
-        photos={school.photos}
-        fallbackUri={school.heroPhotoUrl}
+        photos={media.photos}
+        fallbackUri={media.coverImage}
         height={190}
         radius={20}
       />

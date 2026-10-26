@@ -8,6 +8,7 @@ import type {
   Notice,
   Route,
   SchoolConfig,
+  SchoolMediaConfig,
   ScreenName,
   TeacherRecord,
   ToastMessage,
@@ -15,6 +16,7 @@ import type {
 
 export type AppContextValue = {
   school: SchoolConfig;
+  media: SchoolMediaConfig;
   guardian: GuardianProfile;
   setGuardian: React.Dispatch<React.SetStateAction<GuardianProfile>>;
   children: ChildRecord[];

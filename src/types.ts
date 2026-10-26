@@ -1,5 +1,12 @@
 import type mock from "./data/mock-data.json";
-import type config from "./data/school-config.json";
+import type {
+  SchoolInformation,
+  SchoolMediaConfig as SchoolMediaConfiguration,
+  TeacherRecord as SchoolTeacherRecord,
+} from "./data/schools/types";
+
+export type SchoolMediaConfig = SchoolMediaConfiguration;
+export type TeacherRecord = SchoolTeacherRecord;
 
 export type ScreenName =
   | 'Splash' | 'Login' | 'SignUp' | 'ForgotPassword' | 'Home' | 'AddChild'
@@ -10,7 +17,7 @@ export type ScreenName =
 
 export type Route = { name: ScreenName; params?: Record<string, unknown> };
 export type AttendanceStatus = 'present' | 'absent' | 'holiday' | 'noClass' | 'unmarked';
-export type SchoolConfig = typeof config.school;
+export type SchoolConfig = SchoolInformation;
 export type ComplaintRecord = {
   id: string;
   childId: string;
@@ -53,24 +60,5 @@ export type AcademicYearRecord = ChildRecord["academicYears"][number];
 export type SubjectRecord = AcademicYearRecord["subjects"][number];
 export type TestRecord = SubjectRecord["tests"][number];
 export type FeeReceiptRecord = AcademicYearRecord["feeReceipts"][number];
-export type TeacherRecord = {
-  id: string;
-  name: string;
-  photoUrl: string;
-  designation: string;
-  subjects: string[];
-  highestDegree: string;
-  qualifications: Array<{ degree: string; institution: string; year: string }>;
-  experienceYears: number;
-  specialization: string;
-  about: string;
-  email: string;
-  phone: string;
-  classes: string[];
-  languages: string[];
-  awards: string[];
-  officeHours: string;
-  isActive?: boolean;
-};
 export type Notice = { id: string; type: string; title: string; message: string; dateLabel: string; read: boolean; childId?: string };
 export type ToastMessage = { title: string; message?: string; tone?: 'success' | 'error' | 'info' };

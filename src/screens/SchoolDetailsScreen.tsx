@@ -22,6 +22,7 @@ import { styles } from "./SchoolDetailsScreen.styles";
 export function SchoolDetailsScreen() {
   const {
     school,
+    media,
     navigate,
     goBack,
     setSelectedTeacherId,
@@ -38,8 +39,8 @@ export function SchoolDetailsScreen() {
       onBack={goBack}
     >
       <SchoolPhotoCarousel
-        photos={school.photos}
-        fallbackUri={school.heroPhotoUrl}
+        photos={media.photos}
+        fallbackUri={media.coverImage}
         height={190}
         radius={20}
       />
@@ -101,10 +102,10 @@ export function SchoolDetailsScreen() {
         <>
           <SectionTitle
             title="Campus gallery"
-            subtitle={`${school.photos.length} school photos`}
+            subtitle={`${media.photos.length} school photos`}
           />
           <View style={styles.photoGrid}>
-            {school.photos.map((uri: string, index: number) => (
+            {media.photos.map((uri: string, index: number) => (
               <Pressable
                 key={uri}
                 onPress={() =>
@@ -130,7 +131,7 @@ export function SchoolDetailsScreen() {
             title="School videos"
             subtitle="Highlights shared by the school"
           />
-          {school.videos.map((video) => (
+          {media.videos.map((video) => (
             <Card key={video.id} padding={11}>
               <Pressable
                 onPress={() =>

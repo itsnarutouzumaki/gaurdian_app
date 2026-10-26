@@ -17,6 +17,8 @@ try {
   const format = require(path.join(temp, 'format.js'));
   const calendar = require(path.join(temp, 'calendar.js'));
   const mock = JSON.parse(fs.readFileSync(path.join(root, 'src/data/mock-data.json'), 'utf8'));
+  const activeSchool = JSON.parse(fs.readFileSync(path.join(root, 'src/data/schools/active-school.json'), 'utf8'));
+  const teachers = JSON.parse(fs.readFileSync(path.join(root, 'src/data/schools', activeSchool.schoolId, 'teachers.json'), 'utf8'));
   const complete = mock.guardian;
   assert.equal(format.isProfileComplete(complete), true);
   assert.equal(format.isProfileComplete({ ...complete, fullName: '' }), false);
@@ -37,6 +39,8 @@ try {
     assert.equal(current.subjects.find(subject => subject.name === 'Mathematics').teacherId, 't-priya');
     assert.equal(historical.subjects.find(subject => subject.name === 'Mathematics').teacherId, 't-rakesh');
   }
+  assert.ok(teachers.some(teacher => teacher.id === 't-priya'));
+  assert.ok(teachers.some(teacher => teacher.id === 't-rakesh'));
   console.log('Logic checks passed: profile completion, leave date validation, calendar construction, INR formatting, historical teacher mapping.');
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });

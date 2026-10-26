@@ -1,24 +1,16 @@
 import json, calendar
 from datetime import date
+from pathlib import Path
 
-school_photos = [
- "https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=1200&q=85",
- "https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=1200&q=85",
- "https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1200&q=85",
- "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1200&q=85",
- "https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=1200&q=85",
- "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1200&q=85"
-]
-
-teachers = [
- {"id":"t-priya","name":"Priya Sharma","photoUrl":"https://i.pravatar.cc/240?img=47","designation":"Mathematics Teacher","subjects":["Mathematics"],"highestDegree":"M.Sc. Mathematics","qualifications":[{"degree":"M.Sc. Mathematics","institution":"Banaras Hindu University","year":"2016"},{"degree":"B.Ed.","institution":"University of Allahabad","year":"2018"}],"experienceYears":9,"specialization":"Middle-school mathematics and problem-solving","about":"I enjoy helping students build confidence with mathematical concepts through examples, practice and patient guidance.","email":"priya.sharma@greenwood-demo.edu","phone":"+91 98765 43210","classes":["Class 5","Class 6","Class 7"],"languages":["English","Hindi"],"awards":["Innovative Teaching Practice Award · 2024"],"officeHours":"Monday–Friday · 2:30–3:30 PM"},
- {"id":"t-amit","name":"Amit Verma","photoUrl":"https://i.pravatar.cc/240?img=12","designation":"Physics Teacher","subjects":["Science","Physics"],"highestDegree":"M.Sc. Physics","qualifications":[{"degree":"M.Sc. Physics","institution":"IIT (BHU) Varanasi","year":"2015"},{"degree":"B.Ed.","institution":"Mahatma Gandhi Kashi Vidyapith","year":"2017"}],"experienceYears":11,"specialization":"Physics demonstrations and conceptual science","about":"My classes connect scientific ideas with everyday observations, experiments and curiosity-driven questions.","email":"amit.verma@greenwood-demo.edu","phone":"+91 98765 43211","classes":["Class 7","Class 8","Class 9"],"languages":["English","Hindi"],"awards":["Science Lab Mentor · 2023"],"officeHours":"Tuesday–Thursday · 1:45–2:30 PM"},
- {"id":"t-neha","name":"Neha Gupta","photoUrl":"https://i.pravatar.cc/240?img=44","designation":"English Teacher","subjects":["English"],"highestDegree":"M.A. English","qualifications":[{"degree":"M.A. English Literature","institution":"Banaras Hindu University","year":"2017"},{"degree":"B.Ed.","institution":"University of Allahabad","year":"2019"}],"experienceYears":7,"specialization":"Reading comprehension, writing and communication","about":"I encourage students to read widely, express ideas clearly and develop confidence in written communication.","email":"neha.gupta@greenwood-demo.edu","phone":"+91 98765 43212","classes":["Class 5","Class 8"],"languages":["English","Hindi"],"awards":["Reading Culture Champion · 2025"],"officeHours":"Monday–Wednesday · 2:00–2:45 PM"},
- {"id":"t-rohit","name":"Rohit Singh","photoUrl":"https://i.pravatar.cc/240?img=13","designation":"Computer Science Teacher","subjects":["Computer"],"highestDegree":"M.Tech. Computer Science","qualifications":[{"degree":"M.Tech. Computer Science","institution":"NIT Jamshedpur","year":"2017"},{"degree":"B.Ed.","institution":"IGNOU","year":"2020"}],"experienceYears":8,"specialization":"Digital literacy, computational thinking and coding","about":"I help students use technology thoughtfully while building logical thinking and practical digital skills.","email":"rohit.singh@greenwood-demo.edu","phone":"+91 98765 43213","classes":["Class 5","Class 8","Class 9"],"languages":["English","Hindi"],"awards":[],"officeHours":"Friday · 12:30–1:30 PM"},
- {"id":"t-sunita","name":"Sunita Patel","photoUrl":"https://i.pravatar.cc/240?img=49","designation":"Social Science Teacher","subjects":["Social Science"],"highestDegree":"M.A. History","qualifications":[{"degree":"M.A. History","institution":"Banaras Hindu University","year":"2014"},{"degree":"B.Ed.","institution":"University of Allahabad","year":"2016"}],"experienceYears":12,"specialization":"History, civics and project-based learning","about":"I make history and civics relatable through timelines, maps, discussions and local examples.","email":"sunita.patel@greenwood-demo.edu","phone":"+91 98765 43214","classes":["Class 5","Class 8","Class 9"],"languages":["English","Hindi"],"awards":["Outstanding Mentor · 2022"],"officeHours":"Wednesday · 1:00–2:00 PM"},
- {"id":"t-vikram","name":"Vikram Yadav","photoUrl":"https://i.pravatar.cc/240?img=15","designation":"Hindi Teacher","subjects":["Hindi"],"highestDegree":"M.A. Hindi","qualifications":[{"degree":"M.A. Hindi","institution":"Mahatma Gandhi Kashi Vidyapith","year":"2016"},{"degree":"B.Ed.","institution":"University of Allahabad","year":"2018"}],"experienceYears":10,"specialization":"Hindi literature, grammar and creative writing","about":"My goal is to help students appreciate language and communicate with clarity and imagination.","email":"vikram.yadav@greenwood-demo.edu","phone":"+91 98765 43215","classes":["Class 5","Class 8"],"languages":["Hindi","English"],"awards":[],"officeHours":"Tuesday · 2:30–3:00 PM"},
- {"id":"t-rakesh","name":"Rakesh Tiwari","photoUrl":"https://i.pravatar.cc/240?img=60","designation":"Former Mathematics Teacher","subjects":["Mathematics"],"highestDegree":"M.Sc. Mathematics","qualifications":[{"degree":"M.Sc. Mathematics","institution":"Banaras Hindu University","year":"2009"},{"degree":"B.Ed.","institution":"University of Allahabad","year":"2011"}],"experienceYears":15,"specialization":"Mathematics foundations and exam preparation","about":"Rakesh taught Mathematics at Greenwood in previous academic years, emphasizing clear methods and consistent practice.","email":"rakesh.tiwari@greenwood-demo.edu","phone":"+91 98765 43216","classes":["Class 4","Class 5","Class 6"],"languages":["English","Hindi"],"awards":["Academic Mentor Recognition · 2020"],"officeHours":"Historical faculty record","isActive":False}
-]
+BASE_DIR = Path(__file__).resolve().parent.parent
+active_school = json.loads((BASE_DIR / 'src/data/schools/active-school.json').read_text(encoding='utf-8'))
+school_dir = BASE_DIR / 'src/data/schools' / active_school['schoolId']
+school = json.loads((school_dir / 'school.json').read_text(encoding='utf-8'))
+teachers = json.loads((school_dir / 'teachers.json').read_text(encoding='utf-8'))
+teacher_ids = {teacher['id'] for teacher in teachers}
+required_teacher_ids = {'t-priya', 't-amit', 't-neha', 't-rohit', 't-sunita', 't-vikram', 't-rakesh'}
+if not required_teacher_ids.issubset(teacher_ids):
+    raise ValueError('The active school teacher directory is missing IDs used by generated academic records.')
 
 subjects_for = [
  {"name":"Mathematics","teacherId":"t-priya","icon":"∑","color":"#7456D8"},
@@ -58,7 +50,7 @@ def attendance(year_start, month, seed, today=None):
 def build_child(child_id, name, gender, current_class, section, roll, photo, seed):
     today = date.today()
     years=[]
-    year_defs=[('2026-27',2026,current_class),('2025-26',2025,current_class-1),('2024-25',2024,current_class-2),('2023-24',2023,current_class-3)]
+    year_defs=[(label,int(label.split('-')[0]),current_class-yi) for yi,label in enumerate(school['availableAcademicYears'])]
     for yi,(label,start,grade) in enumerate(year_defs):
         months=[]
         months_active=7 if yi==0 else 12
@@ -101,7 +93,7 @@ def build_child(child_id, name, gender, current_class, section, roll, photo, see
             fee_months.append({'id':f'{child_id}-{label}-fee-{fi}','label':fm,'academicYear':label,'breakdown':breakdown,'total':total,'paid':True if fi < len(months_fee)-1 else seed%2==0,'paymentDate':f'{start if ((4+fi-2)%12+1)>=4 else start+1}-{((4+fi-2)%12+1):02d}-{10+(fi%15):02d}','paymentMode':['UPI','Net Banking','Cash'][fi%3],'transactionId':f'GW{str(start)[-2:]}{roll:03d}{fi:02d}A1'})
         years.append({'label':label,'startYear':start,'className':f'Class {grade}','section':section,'attendance':{'totalClasses':len(allrecs),'present':pres,'absent':absn,'holidays':holiday_count,'percentage':round(pres/max(1,pres+absn)*100),'months':months},'subjects':subjects,'feeReceipts':fee_months,'classTeacherId':'t-sunita' if grade>=8 else 't-priya'})
     current_start=current_class
-    return {'id':child_id,'fullName':name,'photoUrl':photo,'studentId':f'2026-A-{current_class:02d}-{section}-{roll:03d}','className':f'Class {current_class}','section':section,'rollNumber':roll,'relationship':'Child','gender':gender,'dateOfBirth':'2016-02-18' if child_id=='aarav' else '2013-08-07','bloodGroup':'B+','admissionNumber':f'ADM-202{5-seed%2}-{roll:04d}','currentAcademicYear':'2026-27','academicYears':years}
+    return {'id':child_id,'fullName':name,'photoUrl':photo,'studentId':f'2026-A-{current_class:02d}-{section}-{roll:03d}','className':f'Class {current_class}','section':section,'rollNumber':roll,'relationship':'Child','gender':gender,'dateOfBirth':'2016-02-18' if child_id=='aarav' else '2013-08-07','bloodGroup':'B+','admissionNumber':f'ADM-202{5-seed%2}-{roll:04d}','currentAcademicYear':school['defaultAcademicYear'],'academicYears':years}
 
 children=[
  build_child('aarav','Aarav Sharma','Male',5,'A',12,'https://i.pravatar.cc/240?img=11',5),
@@ -118,11 +110,8 @@ notifs=[
 ]
 
 mock={
- 'app':{'name':'Greenwood International School','version':'1.0.0','demoMode':True,'appName':'Greenwood International School','appSlug':'greenwood-international-school','androidPackage':'com.greenwoodinternational.guardian','iosBundleIdentifier':'com.greenwoodinternational.guardian','defaultAcademicYear':'2026-27','availableAcademicYears':['2026-27','2025-26','2024-25','2023-24']},
- 'school':{'id':'greenwood-demo','name':'Greenwood International School','tagline':'Learn · Grow · Succeed','heroPhotoUrl':school_photos[0],'logoEmoji':'✦','established':2010,'address':'RathYatra Road, Varanasi, Uttar Pradesh, India','shortLocation':'Varanasi, Uttar Pradesh','phone':'+91 542 400 2000','email':'hello@greenwood-demo.edu','website':'https://example.org/greenwood-demo','grades':'Nursery – Class 12','about':'Greenwood International School encourages curiosity, kindness and independent thinking. Our learning environment combines strong academic foundations with arts, sports, technology and a supportive school community.','mission':'To nurture confident, compassionate learners who are ready to contribute to their communities.','photos':school_photos,'videos':[{'id':'v1','title':'A day at Greenwood','duration':'2:18','thumbnailUrl':school_photos[2],'url':'https://www.youtube.com/watch?v=aqz-KE-bpKQ'},{'id':'v2','title':'Campus and facilities tour','duration':'3:42','thumbnailUrl':school_photos[3],'url':'https://www.youtube.com/watch?v=aqz-KE-bpKQ'},{'id':'v3','title':'Annual cultural showcase','duration':'4:05','thumbnailUrl':school_photos[4],'url':'https://www.youtube.com/watch?v=aqz-KE-bpKQ'}],'facilities':['Science and computer labs','Library and reading corner','Indoor and outdoor sports','Music and art studios','School transport','Counselling and student support'],'theme':{'primary':'#075DCE','primaryDark':'#073C88','accent':'#20A4F3','success':'#18A66A','danger':'#E34D59','warning':'#E99B25','background':'#F4F7FC','surface':'#FFFFFF','text':'#16233A','muted':'#687892','border':'#E3EAF3','purple':'#7456D8','orange':'#E98A34','successSoft':'#E7F8EF','dangerSoft':'#FFF0F0','warningSoft':'#FFF6E8','blueSoft':'#EAF3FF','purpleSoft':'#F1ECFF','orangeSoft':'#FFF0E5'}},
  'guardian':{'id':'guardian-demo-001','fullName':'Priya Sharma','mobileNumber':'+91 98765 43210','email':'priya.sharma@example.com','profilePhotoUrl':'https://i.pravatar.cc/240?img=47','address':'Varanasi, Uttar Pradesh, India','relationship':'Parent','profileComplete':True},
  'children':children,
- 'teachers':teachers,
  'notifications':notifs,
  'complaints':[{'id':'cmp-001','childId':'aarav','subject':'Transport','message':'The bus was delayed this week. Please share an updated arrival schedule.','attachmentName':None,'status':'In Review','createdAt':'2026-10-18'}],
  'leaveRequests':[{'id':'leave-001','childId':'ananya','startDate':'2026-10-28','endDate':'2026-10-29','reason':'Family commitment','status':'Pending','createdAt':'2026-10-22'}],
@@ -152,9 +141,6 @@ mock={
   {'title':'5. Contact','body':'For this mock school, contact hello@greenwood-demo.edu. Replace these demo details with the school’s approved privacy contact before release.'}
  ]
 }
-config={'app':mock.pop('app'),'school':mock.pop('school')}
-with open('src/data/school-config.json','w',encoding='utf-8') as f:
- json.dump(config,f,ensure_ascii=False,indent=2)
-with open('src/data/mock-data.json','w',encoding='utf-8') as f:
+with open(BASE_DIR / 'src/data/mock-data.json','w',encoding='utf-8') as f:
  json.dump(mock,f,ensure_ascii=False,indent=2)
-print('wrote mock data with',len(children),'children,',len(teachers),'teachers')
+print('wrote operational mock data with',len(children),'children; school teachers remain in the selected school configuration')

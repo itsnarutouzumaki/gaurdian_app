@@ -18,11 +18,11 @@ A **frontend-only, JSON-driven React Native prototype** for the guardian side of
 - Profile, Edit Profile, Change Password, Help & Support, Terms & Conditions, Privacy Policy, logout confirmation dialog.
 - School photos/videos/About/facilities and a searchable teacher directory.
 - Rich mock data for two children, four academic years per child, six active teachers plus one historical faculty record, 37 subject records, 192 tests/exams, fee history, attendance dates, notifications, complaints, leave requests, help and policy content.
-- A school config JSON and a script to apply it to native app metadata before a school-specific build.
+- A school configuration registry that separates school branding and faculty from guardian/student demo records.
 
 ## Requirements
 
-- Node.js 22.13 or newer (recommended for Expo SDK 57).
+- Node.js 22.13 or newer (recommended for Expo SDK 58).
 - npm.
 - Android phone with Expo Go compatible with SDK 57, or an Android emulator. iOS requires macOS/Xcode.
 
@@ -35,7 +35,7 @@ npm run data:check
 npm run start
 ```
 
-Scan the QR code using Expo Go on your Android phone, or press `a` in the terminal to open an Android emulator. The Expo package is pinned to SDK 57 because it is the stable Expo Go target at the time this prototype was created; SDK 58 has recently been released and may not yet be supported by the store version of Expo Go.
+Scan the QR code using an Expo Go version compatible with SDK 58, or press `a` in the terminal to open an Android emulator. Package versions are intentionally pinned in `package.json`.
 
 If Expo shows an SDK/package compatibility warning after the package install, run:
 
@@ -50,32 +50,32 @@ The login form is prefilled with sample details. Any non-empty mobile number and
 
 ## Important data files
 
-### `src/data/school-config.json`
+### `src/data/schools/`
 
-The primary school customization file. It controls:
+- `active-school.json` selects the school by ID.
+- `<school-id>/school.json` contains the school identity, contact/About information, facilities and academic-year options.
+- `<school-id>/app-config.json` contains Expo app identity, native package identifiers and Android splash settings. Launcher icon paths are optional and remain unset until supplied.
+- `<school-id>/theme.json` contains the default appearance mode and semantic palettes. The dark palette is `null` until real dark-mode colors are provided.
+- `<school-id>/media.json` contains the configured cover image, ordered gallery, videos and logo metadata.
+- `<school-id>/teachers.json` is the canonical teacher directory. Historical teacher IDs referenced by academic records remain unchanged.
+- `<school-id>/assets.ts` statically maps bundled React Native images. JSON must reference an asset key; a filesystem path in JSON is not a valid React Native image source.
+- `registry.ts` is the typed registry and the single runtime selector. Only `greenwood-demo` is registered; add school data and a registry entry before selecting another school.
 
-- `app.defaultAcademicYear`, `app.availableAcademicYears`
-- school name and tagline
-- school location/contact/About text/facilities
-- hero image, school gallery images, linked videos
-- school UI theme colors
+`src/data/mock-data.json` remains the guardian/student and operational demo dataset (academic records, attendance, fees, requests and notifications); teacher profiles are no longer duplicated there.
+`src/theme.ts` is the theme facade and keeps the existing `C`, `R` and `S` exports.
 
-To apply the school name to the native launcher name and package identifiers before making a school build:
+To apply the selected school’s app identity and appearance to native metadata before a school-specific build:
 
 ```bash
-# Edit src/data/school-config.json first
+# Edit the selected school configuration first
 npm run config:apply
 ```
 
-Native launcher name, bundle ID, and Android package name are build-time configuration. They cannot change on a device merely because a JSON file changed inside an already-installed app. The app’s on-screen school branding is loaded from the JSON at runtime.
-
-### `src/data/mock-data.json`
-
-Contains the demo guardian, children, academic records, attendance, subjects/tests, teacher profiles, receipts, notices, complaints, leave requests, help topics, terms and privacy text. Edit this file to create other test scenarios. For example, blank `guardian.fullName` or `guardian.profilePhotoUrl` to test that Add Child redirects to Edit Profile.
+Native launcher name, bundle ID, package name, icon and launch screen are build-time configuration. They cannot change on a device merely because JSON changed inside an installed app. The `expo-splash-screen` plugin uses the selected school’s Android splash image, width, resize mode and background color; changing these settings requires a new native build. The logo in `media.json` is a school UI logo and is not used as a launcher icon. The currently configured school and launch logo is the MNNIT logo selected by the user; the school gallery and video thumbnails are existing HTTPS demo URLs.
 
 ### `scripts/generate-mock-data.py`
 
-Regenerates the synthetic demo dataset and the school config for reproducible test data. Run from the project root:
+Regenerates only the operational mock dataset. It reads the selected school's canonical teacher IDs and does not rewrite school identity, theme, media, app config or teacher files. Run from the project root:
 
 ```bash
 python scripts/generate-mock-data.py
@@ -105,7 +105,7 @@ npm run typecheck
 npm run verify
 ```
 
-`data:check` verifies the JSON structure, unique student IDs, multiple academic years, teachers linked to subjects, test marks, fee records, child references and the rule that subject-level overview records do not contain marks or question-wise marks. TypeScript is checked with `tsc` once npm dependencies are installed.
+`data:check` verifies the selected school configuration, synchronized Expo identity, unique student IDs, academic years, teacher references, test marks, fee records, child references and the rule that subject-level overview records do not contain marks or question-wise marks. TypeScript is checked with `tsc` once npm dependencies are installed.
 
 ## Limitations (intentional for the requested scope)
 

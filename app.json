@@ -15,11 +15,30 @@
       "package": "com.greenwoodinternational.guardian",
       "adaptiveIcon": {
         "backgroundColor": "#073C88"
-      }
+      },
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "plugins": [
       "expo-image-picker",
-      "expo-document-picker"
-    ]
+      "expo-document-picker",
+      [
+        "expo-splash-screen",
+        {
+          "android": {
+            "image": "./assets/mnnit-logo-white.png",
+            "imageWidth": 240,
+            "resizeMode": "contain",
+            "backgroundColor": "#073C88"
+          }
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "0c18a893-cad7-4e72-a4cb-4bb4587ecf87"
+      }
+    }
   }
 }

@@ -17,7 +17,10 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { C, R } from "../theme";
 import { initials } from "../lib/format";
+import { getActiveSchoolConfig } from "../data/schools/registry";
 import { styles } from "./UI.styles";
+
+const schoolLogo = getActiveSchoolConfig().media.logo;
 
 export function Page({
   children,
@@ -172,10 +175,10 @@ export function SchoolMark({
       ]}
     >
       <Image
-        source={require("../../assets/mnnit-logo.png")}
+        source={schoolLogo.source}
         resizeMode="contain"
         accessible
-        accessibilityLabel="MNNIT Allahabad logo"
+        accessibilityLabel={schoolLogo.altText}
         style={{ width: size, height: size }}
       />
     </View>

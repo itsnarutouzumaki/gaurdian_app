@@ -1,0 +1,31 @@
+{
+  "defaultMode": "light",
+  "light": {
+    "primary": "#075DCE",
+    "primaryDark": "#073C88",
+    "secondary": "#20A4F3",
+    "accent": "#20A4F3",
+    "primaryButtonBackground": "#075DCE",
+    "primaryButtonText": "#FFFFFF",
+    "link": "#075DCE",
+    "pageBackground": "#F4F7FC",
+    "cardBackground": "#FFFFFF",
+    "text": "#16233A",
+    "mutedText": "#687892",
+    "border": "#E3EAF3",
+    "success": "#18A66A",
+    "successSoft": "#E7F8EF",
+    "danger": "#E34D59",
+    "dangerSoft": "#FFF0F0",
+    "warning": "#E99B25",
+    "warningSoft": "#FFF6E8",
+    "blueSoft": "#EAF3FF",
+    "purple": "#7456D8",
+    "purpleSoft": "#F1ECFF",
+    "orange": "#E98A34",
+    "orangeSoft": "#FFF0E5",
+    "teal": "#169DAB",
+    "shadow": "#19375A"
+  },
+  "dark": null
+}

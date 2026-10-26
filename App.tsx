@@ -4,7 +4,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { AppProvider } from "./src/app-context";
 import type { AppContextValue } from "./src/app-context";
 import mock from "./src/data/mock-data.json";
-import config from "./src/data/school-config.json";
+import { getActiveSchoolConfig } from "./src/data/schools/registry";
 import type {
   ComplaintRecord,
   GuardianProfile,
@@ -49,7 +49,7 @@ import { TeachersDirectoryScreen } from "./src/screens/TeachersDirectoryScreen";
 import { TeacherProfileScreen } from "./src/screens/TeacherProfileScreen";
 
 const seed = mock;
-const schoolConfig = config;
+const schoolConfig = getActiveSchoolConfig();
 const children = seed.children;
 
 export default function App() {
@@ -74,11 +74,11 @@ export default function App() {
     children[0]?.id || "",
   );
   const [selectedYear, setSelectedYear] = useState<string>(
-    schoolConfig.app.defaultAcademicYear,
+    schoolConfig.school.defaultAcademicYear,
   );
   const [selectedSubjectId, setSelectedSubjectId] = useState<string>("");
   const [selectedTeacherId, setSelectedTeacherId] = useState<string>(
-    seed.teachers[0]?.id || "",
+    schoolConfig.teachers[0]?.id || "",
   );
   const [toast, setToast] = useState<ToastMessage | null>(null);
   const [logoutDialogVisible, setLogoutDialogVisible] = useState(false);
@@ -125,6 +125,7 @@ export default function App() {
   const value: AppContextValue = useMemo(
     () => ({
       school: schoolConfig.school,
+      media: schoolConfig.media,
       guardian,
       setGuardian,
       children,
@@ -136,7 +137,7 @@ export default function App() {
       setLeaveRequests,
       linkRequests,
       setLinkRequests,
-      teachers: seed.teachers,
+      teachers: schoolConfig.teachers,
       selectedChildId,
       setSelectedChildId: changeChild,
       selectedYear,

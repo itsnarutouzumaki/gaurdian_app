@@ -1,0 +1,26 @@
+{
+  "appName": "Greenwood International School",
+  "slug": "greenwood-international-school",
+  "scheme": "greenwood-international-school",
+  "version": "1.0.0",
+  "demoMode": true,
+  "android": {
+    "package": "com.greenwoodinternational.guardian",
+    "adaptiveIcon": {
+      "foregroundImage": null,
+      "backgroundColor": "#073C88"
+    }
+  },
+  "splash": {
+    "android": {
+      "image": "./assets/mnnit-logo-white.png",
+      "imageWidth": 240,
+      "resizeMode": "contain",
+      "backgroundColor": "#073C88"
+    }
+  },
+  "ios": {
+    "bundleIdentifier": "com.greenwoodinternational.guardian"
+  },
+  "icon": null
+}

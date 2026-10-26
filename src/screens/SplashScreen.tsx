@@ -12,13 +12,13 @@ import { C } from "../theme";
 import { styles } from "./SplashScreen.styles";
 
 export function SplashScreen() {
-  const { school, navigate } = useApp();
+  const { school, media, navigate } = useApp();
   return (
     <Page scroll={false} contentStyle={styles.pageContent}>
       <View style={styles.root}>
         <View style={styles.hero}>
           <Image
-            source={{ uri: school.heroPhotoUrl }}
+            source={{ uri: media.coverImage }}
             resizeMode="cover"
             style={[StyleSheet.absoluteFill, styles.heroImage]}
             accessible={false}
