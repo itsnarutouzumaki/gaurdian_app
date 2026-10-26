@@ -83,12 +83,8 @@ export function ChangePasswordScreen() {
               title: "Password updated (demo)",
               message: "No real account password was changed.",
               tone: "success",
+              action: { label: "Done", onPress: goBack },
             });
-            Alert.alert(
-              "Demo only",
-              "Password validation passed. Connect authentication before enabling real password changes.",
-              [{ text: "Done", onPress: goBack }],
-            );
           }}
         />
       </Card>

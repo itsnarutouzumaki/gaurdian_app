@@ -60,6 +60,11 @@ try {
   assert.equal(parsePushTapPayload({ route: 'Home', childId: 7 }), null);
   assert.equal(parsePushTapPayload(null), null);
   assert.equal(format.money(123456), '₹1,23,456');
+  const englishDate = format.dateLabel('2026-10-24');
+  format.setFormatLanguage('hi');
+  assert.notEqual(format.dateLabel('2026-10-24'), englishDate);
+  assert.match(format.monthTitle('October', 2026), /अक्टूबर/);
+  format.setFormatLanguage('en');
   for (const child of mock.children) {
     const current = child.academicYears.find(year => year.label === '2026-27');
     const historical = child.academicYears.find(year => year.label === '2024-25');

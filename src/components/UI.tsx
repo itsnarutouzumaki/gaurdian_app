@@ -200,6 +200,7 @@ export function SchoolMark({
 
 export function SelectField({
   label,
+  required = false,
   value,
   placeholder,
   onPress,
@@ -208,6 +209,7 @@ export function SelectField({
   style,
 }: {
   label: string;
+  required?: boolean;
   value: string;
   placeholder: string;
   onPress: () => void;
@@ -223,6 +225,7 @@ export function SelectField({
         style={styles.selectLabel}
       >
         {label}
+        {required ? <RequiredIndicator /> : null}
       </AppText>
       <Pressable
         accessibilityRole="button"
@@ -237,6 +240,15 @@ export function SelectField({
         </AppText>
       </Pressable>
     </View>
+  );
+}
+
+export function RequiredIndicator() {
+  return (
+    <AppText size={12} style={styles.requiredIndicator}>
+      {" "}
+      *
+    </AppText>
   );
 }
 
@@ -366,12 +378,7 @@ export function Field({
         style={styles.fieldLabel}
       >
         {label}
-        {required ? (
-          <AppText size={12} color={C.danger}>
-            {" "}
-            *
-          </AppText>
-        ) : null}
+        {required ? <RequiredIndicator /> : null}
       </AppText>
       <View
         style={[
@@ -678,12 +685,15 @@ export function BottomTabs({
   onPress,
   profileName,
   profilePhotoUrl,
+  hasUnreadNotifications,
 }: {
   active: "Home" | "Notifications" | "Profile";
   onPress: (tab: "Home" | "Notifications" | "Profile") => void;
   profileName: string;
   profilePhotoUrl: string | null;
+  hasUnreadNotifications: boolean;
 }) {
+  const language = useLanguage();
   const tabs: Array<{
     key: "Home" | "Notifications" | "Profile";
     label: string;
@@ -709,7 +719,16 @@ export function BottomTabs({
               ⌂
             </AppText>
           ) : tab.key === "Notifications" ? (
-            <BellIcon color={active === tab.key ? C.primary : C.muted} />
+            <View>
+              <BellIcon color={active === tab.key ? C.primary : C.muted} />
+              {hasUnreadNotifications ? (
+                <View
+                  accessible
+                  accessibilityLabel={translate("Unread notifications", language)}
+                  style={styles.notificationIndicator}
+                />
+              ) : null}
+            </View>
           ) : (
             <Avatar
               name={profileName}

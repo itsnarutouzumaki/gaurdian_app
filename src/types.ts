@@ -61,4 +61,9 @@ export type SubjectRecord = AcademicYearRecord["subjects"][number];
 export type TestRecord = SubjectRecord["tests"][number];
 export type FeeReceiptRecord = AcademicYearRecord["feeReceipts"][number];
 export type Notice = { id: string; type: string; title: string; message: string; dateLabel: string; read: boolean; childId?: string };
-export type ToastMessage = { title: string; message?: string; tone?: 'success' | 'error' | 'info' };
+export type ToastMessage = {
+  title: string;
+  message?: string;
+  tone?: "success" | "error" | "info";
+  action?: { label: string; onPress: () => void };
+};

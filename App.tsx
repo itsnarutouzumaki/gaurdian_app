@@ -1,5 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Alert, BackHandler, Platform, StatusBar, View } from "react-native";
+import {
+  Alert,
+  BackHandler,
+  Platform,
+  Pressable,
+  StatusBar,
+  View,
+} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { isRunningInExpoGo } from "expo";
 import { getLocales } from "expo-localization";
@@ -11,6 +18,7 @@ import type { AppContextValue } from "./src/app-context";
 import mock from "./src/data/mock-data.json";
 import { getActiveSchoolConfig } from "./src/data/schools/registry";
 import { getHardwareBackDecision } from "./src/lib/back-navigation";
+import { setFormatLanguage } from "./src/lib/format";
 import { i18n, translate, type Language } from "./src/lib/i18n";
 import { configurePushChannel } from "./src/lib/push-notifications";
 import {
@@ -141,20 +149,33 @@ export default function App() {
     await i18n.changeLanguage(nextLanguage);
     setLanguageState(nextLanguage);
   }, []);
+  useEffect(() => setFormatLanguage(language), [language]);
   const showAlert = useCallback(
     (...args: Parameters<typeof Alert.alert>) => {
       const [title, message, buttons, options] = args;
+      const localizedTitle = translate(title ?? "", language);
+      const localizedMessage = message
+        ? translate(message, language)
+        : undefined;
+      if (!buttons?.length) {
+        showToast({
+          title: localizedTitle,
+          message: localizedMessage,
+          tone: "info",
+        });
+        return;
+      }
       Alert.alert(
-        translate(title ?? "", language),
-        message ? translate(message, language) : undefined,
-        buttons?.map((button) => ({
+        localizedTitle,
+        localizedMessage,
+        buttons.map((button) => ({
           ...button,
           text: button.text ? translate(button.text, language) : undefined,
         })),
         options,
       );
     },
-    [language],
+    [language, showToast],
   );
   const changeChild = useCallback((id: string) => {
     setSelectedChildIdState(id);
@@ -488,6 +509,7 @@ export default function App() {
               onPress={onTabPress}
               profileName={guardian.fullName}
               profilePhotoUrl={guardian.profilePhotoUrl}
+              hasUnreadNotifications={notifications.some((item) => !item.read)}
             />
           ) : null}
           {toast ? (
@@ -514,6 +536,19 @@ export default function App() {
                   <AppText size={11} color="#EAF3FF" style={styles.toastMessage}>
                     {toast.message}
                   </AppText>
+                ) : null}
+                {toast.action ? (
+                  <Pressable
+                    onPress={() => {
+                      toast.action?.onPress();
+                      setToast(null);
+                    }}
+                    style={styles.toastAction}
+                  >
+                    <AppText size={11} color="#FFFFFF" weight="bold">
+                      {toast.action.label}
+                    </AppText>
+                  </Pressable>
                 ) : null}
               </View>
             </View>

@@ -19,6 +19,7 @@ export const styles = StyleSheet.create({
     elevation: 6,
   },
   toastMessage: { marginTop: 3 },
+  toastAction: { alignSelf: "flex-start", marginTop: 8, paddingVertical: 2 },
   logoutActions: {
     flexDirection: "row",
     gap: 9,

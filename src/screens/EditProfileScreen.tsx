@@ -10,6 +10,7 @@ import {
   Field,
   InfoBanner,
   Page,
+  RequiredIndicator,
 } from "../components/UI";
 import { C } from "../theme";
 import { SAMPLE_PROFILE_PHOTOS } from "../data/screen-options";
@@ -85,10 +86,8 @@ export function EditProfileScreen() {
       <Card padding={16}>
         <View style={styles.photoSection}>
           <AppText size={12} weight="semibold" style={styles.photoLabel}>
-            Profile photo{" "}
-            <AppText size={12} color={C.danger}>
-              *
-            </AppText>
+            Profile photo
+            <RequiredIndicator />
           </AppText>
           <Pressable onPress={choosePhoto}>
             <Avatar
@@ -220,15 +219,10 @@ export function EditProfileScreen() {
             setSaving(false);
             showToast({
               title: "Profile updated",
-              message:
-                "Your name and profile photo have been saved for this session.",
+              message: "Your profile details have been updated in this demo.",
               tone: "success",
+              action: { label: "Done", onPress: () => replace("MyProfile") },
             });
-            Alert.alert(
-              "Profile updated",
-              "Your profile details have been updated in this demo.",
-              [{ text: "Done", onPress: () => replace("MyProfile") }],
-            );
           }}
           style={styles.save}
         />

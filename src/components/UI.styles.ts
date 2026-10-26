@@ -169,6 +169,17 @@ export const styles = StyleSheet.create({
     borderBottomLeftRadius: 2,
     borderBottomRightRadius: 2,
   },
+  notificationIndicator: {
+    position: "absolute",
+    top: 0,
+    right: -1,
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+    backgroundColor: C.danger,
+    borderWidth: 1,
+    borderColor: "#FFFFFF",
+  },
   personIcon: { alignItems: "center", justifyContent: "center", gap: 1 },
   personHead: { width: 6, height: 6, borderRadius: 3 },
   personBody: {
@@ -215,6 +226,7 @@ export const styles = StyleSheet.create({
   buttonIcon: { marginRight: 7 },
   field: { marginBottom: 14 },
   fieldLabel: { marginBottom: 7 },
+  requiredIndicator: { color: C.danger, fontSize: 12, fontWeight: "700" },
   fieldMessage: { marginTop: 4 },
   photo: {
     overflow: "hidden",

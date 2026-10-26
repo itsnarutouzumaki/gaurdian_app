@@ -24,6 +24,7 @@ export function SubjectResultsScreen() {
     navigate,
     goBack,
     teachers,
+    showToast,
   } = useApp();
   const child = getChild(children, selectedChildId);
   const year = getAcademicYear(child, selectedYear);
@@ -118,6 +119,7 @@ export function SubjectResultsScreen() {
                       "",
                       "Replace this mock document with the approved school document when backend storage is connected.",
                     ],
+                    showToast,
                   )
                 }
                 style={[

@@ -126,14 +126,11 @@ export function AddChildScreen() {
             setSubmitting(false);
             showToast({
               title: "Request submitted",
-              message: "The principal will review the student details.",
+              message:
+                "Your request was sent to the principal. The child will appear in My Children only after approval.",
               tone: "success",
+              action: { label: "Done", onPress: () => navigate("Home") },
             });
-            Alert.alert(
-              "Request submitted",
-              "Your request was sent to the principal. The child will appear in My Children only after approval.",
-              [{ text: "Done", onPress: () => navigate("Home") }],
-            );
           }}
         />
       </Card>

@@ -10,6 +10,7 @@ import {
   Field,
   InfoBanner,
   Page,
+  RequiredIndicator,
   SelectField,
   SectionTitle,
 } from "../components/UI";
@@ -75,7 +76,8 @@ export function RaiseComplaintScreen() {
       />
       <Card padding={15}>
         <SelectField
-          label="Select child *"
+          label="Select child"
+          required
           value={`${selectedChild.fullName} (${year.className} ${year.section})`}
           placeholder="Choose a child"
           onPress={() => setChildPicker(true)}
@@ -177,19 +179,14 @@ export function RaiseComplaintScreen() {
             setSubmitting(false);
             showToast({
               title: "Complaint submitted",
-              message: "The principal has been notified in this demo.",
+              message:
+                "Your complaint has been added to the demo records and a notification has been created.",
               tone: "success",
+              action: {
+                label: "View notifications",
+                onPress: () => navigate("Notifications"),
+              },
             });
-            Alert.alert(
-              "Complaint submitted",
-              "Your complaint has been added to the demo records and a notification has been created.",
-              [
-                {
-                  text: "View notifications",
-                  onPress: () => navigate("Notifications"),
-                },
-              ],
-            );
           }}
           style={styles.submit}
         />

@@ -1,6 +1,6 @@
 import { File, Paths } from "expo-file-system";
 import * as Sharing from "expo-sharing";
-import { Alert } from "react-native";
+import type { ToastMessage } from "../types";
 
 const cleanAscii = (value: string) => value.normalize('NFKD').replace(/[^\x20-\x7E]/g, ' ');
 const escapePdf = (value: string) => cleanAscii(value).replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)');
@@ -39,7 +39,11 @@ function makeOnePagePdf(title: string, lines: string[]) {
   return pdf;
 }
 
-export async function shareDemoPdf(title: string, lines: string[]) {
+export async function shareDemoPdf(
+  title: string,
+  lines: string[],
+  notify: (toast: ToastMessage) => void,
+) {
   try {
     const safeName =
       title
@@ -60,13 +64,18 @@ export async function shareDemoPdf(title: string, lines: string[]) {
         UTI: "com.adobe.pdf",
       });
     } else {
-      Alert.alert("PDF created", `A demo PDF was created at:\n${file.uri}`);
+      notify({
+        title: "PDF created",
+        message: `A demo PDF was created at: ${file.uri}`,
+        tone: "success",
+      });
     }
   } catch (error) {
-    const message =
-      error instanceof Error
-        ? error.message
-        : "Unable to create the sample PDF.";
-    Alert.alert("PDF unavailable", message);
+    console.error("Unable to create or share the demo PDF.", error);
+    notify({
+      title: "PDF unavailable",
+      message: "Unable to create the sample PDF.",
+      tone: "error",
+    });
   }
 }

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { View } from "react-native";
 import { useApp, useAppAlert } from "../app-context";
+import { translate } from "../lib/i18n";
 import {
   ActionButton,
   AppText,
@@ -17,12 +18,14 @@ import { styles } from "./HelpSupportScreen.styles";
 
 export function HelpSupportScreen() {
   const Alert = useAppAlert();
-  const { navigate, goBack, school } = useApp();
+  const { navigate, goBack, school, language } = useApp();
   const topics: HelpTopic[] = mock.helpTopics;
   const [opened, setOpened] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const filtered = topics.filter((item) =>
-    `${item.title} ${item.body}`.toLowerCase().includes(query.toLowerCase()),
+    `${translate(item.title, language)} ${translate(item.body, language)}`
+      .toLowerCase()
+      .includes(query.toLowerCase()),
   );
   return (
     <Page

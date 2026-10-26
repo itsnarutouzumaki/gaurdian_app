@@ -19,7 +19,14 @@ import { C } from "../theme";
 import { styles } from "./FeesReceiptScreen.styles";
 
 export function FeesReceiptScreen() {
-  const { school, children, selectedChildId, selectedYear, goBack } = useApp();
+  const {
+    school,
+    children,
+    selectedChildId,
+    selectedYear,
+    goBack,
+    showToast,
+  } = useApp();
   const child = getChild(children, selectedChildId);
   const year = getAcademicYear(child, selectedYear);
   const receipts = year.feeReceipts;
@@ -153,7 +160,7 @@ export function FeesReceiptScreen() {
               `Transaction ID: ${paid ? receipt.transactionId : "Not generated"}`,
               "",
               "DEMO DOCUMENT — Replace with the official receipt service before release.",
-            ])
+            ], showToast)
           }
           style={styles.download}
         />
