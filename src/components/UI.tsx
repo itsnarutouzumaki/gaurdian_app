@@ -20,10 +20,11 @@ import { translate } from "../lib/i18n";
 import { useTranslation } from "react-i18next";
 import { C, R } from "../theme";
 import { initials } from "../lib/format";
-import { getActiveSchoolConfig } from "../data/schools/registry";
+import { getSchoolConfiguration } from "../config/schoolConfig";
 import { styles } from "./UI.styles";
 
-const schoolLogo = getActiveSchoolConfig().media.logo;
+const schoolLogo = require("../../../shared/assets/logo.png");
+const schoolName = getSchoolConfiguration().school.name;
 
 export function Page({
   children,
@@ -48,7 +49,7 @@ export function Page({
     <View style={[styles.pageContent, contentStyle]}>{children}</View>
   );
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safe} edges={["top", "left", "right"]}>
       {title ? (
         <View style={styles.header}>
           {onBack ? (
@@ -188,10 +189,10 @@ export function SchoolMark({
       ]}
     >
       <Image
-        source={schoolLogo.source}
+        source={schoolLogo}
         resizeMode="contain"
         accessible
-        accessibilityLabel={schoolLogo.altText}
+        accessibilityLabel={`${schoolName} logo`}
         style={{ width: size, height: size }}
       />
     </View>
@@ -703,51 +704,53 @@ export function BottomTabs({
     { key: "Profile", label: "Profile" },
   ];
   return (
-    <View style={styles.bottomTabs}>
-      {tabs.map((tab) => (
-        <Pressable
-          key={tab.key}
-          onPress={() => onPress(tab.key)}
-          style={styles.tabButton}
-        >
-          {tab.key === "Home" ? (
-            <AppText
-              size={22}
-              color={active === tab.key ? C.primary : C.muted}
-              weight="semibold"
-            >
-              ⌂
-            </AppText>
-          ) : tab.key === "Notifications" ? (
-            <View>
-              <BellIcon color={active === tab.key ? C.primary : C.muted} />
-              {hasUnreadNotifications ? (
-                <View
-                  accessible
-                  accessibilityLabel={translate("Unread notifications", language)}
-                  style={styles.notificationIndicator}
-                />
-              ) : null}
-            </View>
-          ) : (
-            <Avatar
-              name={profileName}
-              uri={profilePhotoUrl}
-              size={22}
-              fallback="person"
-              fallbackColor={active === tab.key ? C.primary : C.muted}
-            />
-          )}
-          <AppText
-            size={10}
-            color={active === tab.key ? C.primary : C.muted}
-            weight={active === tab.key ? "bold" : "medium"}
+    <SafeAreaView edges={["bottom"]} style={styles.bottomTabsSafeArea}>
+      <View style={styles.bottomTabs}>
+        {tabs.map((tab) => (
+          <Pressable
+            key={tab.key}
+            onPress={() => onPress(tab.key)}
+            style={styles.tabButton}
           >
-            {tab.label}
-          </AppText>
-        </Pressable>
-      ))}
-    </View>
+            {tab.key === "Home" ? (
+              <AppText
+                size={22}
+                color={active === tab.key ? C.primary : C.muted}
+                weight="semibold"
+              >
+                ⌂
+              </AppText>
+            ) : tab.key === "Notifications" ? (
+              <View>
+                <BellIcon color={active === tab.key ? C.primary : C.muted} />
+                {hasUnreadNotifications ? (
+                  <View
+                    accessible
+                    accessibilityLabel={translate("Unread notifications", language)}
+                    style={styles.notificationIndicator}
+                  />
+                ) : null}
+              </View>
+            ) : (
+              <Avatar
+                name={profileName}
+                uri={profilePhotoUrl}
+                size={22}
+                fallback="person"
+                fallbackColor={active === tab.key ? C.primary : C.muted}
+              />
+            )}
+            <AppText
+              size={10}
+              color={active === tab.key ? C.primary : C.muted}
+              weight={active === tab.key ? "bold" : "medium"}
+            >
+              {tab.label}
+            </AppText>
+          </Pressable>
+        ))}
+      </View>
+    </SafeAreaView>
   );
 }
 
@@ -769,15 +772,20 @@ export function ModalFrame({
       animationType="fade"
       onRequestClose={onClose}
     >
-      <View style={styles.modalBackdrop}>
-        <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
-        <View style={styles.modalCard}>
-          <AppText size={17} weight="bold">
-            {title}
-          </AppText>
-          <View style={styles.modalContent}>{children}</View>
+      <SafeAreaView
+        style={styles.modalSafe}
+        edges={["top", "right", "bottom", "left"]}
+      >
+        <View style={styles.modalBackdrop}>
+          <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
+          <View style={styles.modalCard}>
+            <AppText size={17} weight="bold">
+              {title}
+            </AppText>
+            <View style={styles.modalContent}>{children}</View>
+          </View>
         </View>
-      </View>
+      </SafeAreaView>
     </Modal>
   );
 }

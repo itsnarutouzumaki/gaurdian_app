@@ -1,4 +1,3 @@
-import type { ImageSourcePropType } from "react-native";
 export type SchoolInformation = {
   id: string;
   name: string;
@@ -52,7 +51,6 @@ export type SchoolTheme = {
 };
 
 export type AppConfiguration = {
-  appName: string;
   slug: string;
   scheme: string;
   version: string;
@@ -61,7 +59,7 @@ export type AppConfiguration = {
     package: string;
     adaptiveIcon: {
       foregroundImage: string | null;
-      backgroundColor: string;
+      backgroundColor?: string;
     };
   };
   splash: {
@@ -69,7 +67,7 @@ export type AppConfiguration = {
       image: string;
       imageWidth: number;
       resizeMode: "contain" | "cover";
-      backgroundColor: string;
+      backgroundColor?: string;
     };
   };
   ios: { bundleIdentifier: string };
@@ -105,12 +103,6 @@ export type TeacherRecord = {
 };
 
 export type SchoolMediaConfig = {
-  logo: {
-    kind: "bundled";
-    assetKey: string;
-    altText: string;
-    source: ImageSourcePropType;
-  };
   coverImage: string;
   photos: string[];
   videos: SchoolVideo[];

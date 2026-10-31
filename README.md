@@ -22,27 +22,26 @@ A **frontend-only, JSON-driven React Native prototype** for the guardian side of
 
 ## Requirements
 
-- Node.js 22.13 or newer (recommended for Expo SDK 58).
+- Node.js 22.13 or newer.
 - npm.
-- Android phone with Expo Go compatible with SDK 57, or an Android emulator. iOS requires macOS/Xcode.
+- Android Studio with the Android SDK and an emulator or USB-connected phone. iOS builds require macOS, Xcode and CocoaPods.
 
 ## Run locally
 
 ```bash
 npm install
-npx expo install --fix
+npm run config:apply
 npm run data:check
 npm run start
 ```
 
-Scan the QR code using an Expo Go version compatible with SDK 58, or press `a` in the terminal to open an Android emulator. Package versions are intentionally pinned in `package.json`.
-
-If Expo shows an SDK/package compatibility warning after the package install, run:
+In a second terminal, install and launch the Android app:
 
 ```bash
-npx expo install --fix
-npx expo start --clear
+npm run android
 ```
+
+For iOS, run `cd ios && pod install` on macOS, then `npm run ios`. Native modules are linked by the React Native CLI.
 
 ## Demo login
 
@@ -50,28 +49,24 @@ The login form is prefilled with sample details. Any non-empty mobile number and
 
 ## Important data files
 
-### `src/data/schools/`
+### Shared school configuration
 
-- `active-school.json` selects the school by ID.
-- `<school-id>/school.json` contains the school identity, contact/About information, facilities and academic-year options.
-- `<school-id>/app-config.json` contains Expo app identity, native package identifiers, launcher icon paths and Android splash settings. The current Greenwood launcher icon is a provisional blue-and-white “GI” monogram; replace it with approved school artwork before release.
-- `<school-id>/theme.json` contains the default appearance mode and semantic palettes. The dark palette is `null` until real dark-mode colors are provided.
-- `<school-id>/media.json` contains the configured cover image, ordered gallery, videos and logo metadata.
-- `<school-id>/teachers.json` is the canonical teacher directory. Historical teacher IDs referenced by academic records remain unchanged.
-- `<school-id>/assets.ts` statically maps bundled React Native images. JSON must reference an asset key; a filesystem path in JSON is not a valid React Native image source.
-- `registry.ts` is the typed registry and the single runtime selector. Only `greenwood-demo` is registered; add school data and a registry entry before selecting another school.
+`../shared/school-config.json` is the source for both applications' school identity, theme, academic defaults, media metadata and supported languages. Both apps import this root-level JSON through a typed `src/config/schoolConfig.ts` module. Metro watches the root `shared/` directory.
+
+The shared configuration points to the owner-provided `../shared/assets/logo.png`. Both apps render that source directly in their UI. Native package IDs, app version, launcher paths and splash settings remain app-specific in `src/data/schools/greenwood-demo/app-config.json`; `npm run config:apply` syncs app identity and native splash branding into the React Native CLI projects.
+
+`src/data/schools/greenwood-demo/teachers.json` remains local demo teacher data and is not part of the shared static school configuration.
 
 `src/data/mock-data.json` remains the guardian/student and operational demo dataset (academic records, attendance, fees, requests and notifications); teacher profiles are no longer duplicated there.
 `src/theme.ts` is the theme facade and keeps the existing `C`, `R` and `S` exports.
 
-To apply the selected school’s app identity and appearance to native metadata before a school-specific build:
+To apply shared school identity/theme and the app-specific native metadata before a school-specific build:
 
 ```bash
-# Edit the selected school configuration first
 npm run config:apply
 ```
 
-Native launcher name, bundle ID, package name, icon and launch screen are build-time configuration. They cannot change on a device merely because JSON changed inside an installed app. The `expo-splash-screen` plugin uses the selected school’s Android splash image, width, resize mode and background color; changing these settings requires a new native build. The logo in `media.json` is a school UI logo and is not used as a launcher icon. The current splash screen retains the MNNIT logo previously authorized for this prototype; the launcher uses a separate provisional GI icon, not the MNNIT logo. The school gallery and video thumbnails are existing HTTPS demo URLs.
+The supplied logo is bundled directly in the UI. Native launcher name, bundle ID, package name, icon and launch screen are build-time configuration. They cannot change on a device merely because JSON changed inside an installed app. The school gallery and video thumbnails are existing HTTPS demo URLs.
 
 ### `scripts/generate-mock-data.py`
 
@@ -106,18 +101,18 @@ npm test
 npm run verify
 ```
 
-`data:check` verifies the selected school configuration, synchronized Expo identity and launcher assets, unique student IDs, academic years, teacher references, test marks, fee records, child references and the rule that subject-level overview records do not contain marks or question-wise marks. `npm test` runs the logic and localization checks; `npm run verify` also checks routes, syntax, static styles and TypeScript.
+`data:check` verifies the selected school configuration, synchronized native app identity and splash assets, unique student IDs, academic years, teacher references, test marks, fee records, child references and the rule that subject-level overview records do not contain marks or question-wise marks. `npm test` runs the logic and localization checks; `npm run verify` also checks routes, syntax, static styles and TypeScript.
 
 ## Language, Android Back and notifications
 
 - English and Hindi are available from the Language row on My Profile. The app uses `i18next` / `react-i18next`, starts from the device language when supported, and stores a user selection locally with AsyncStorage. Untranslated dynamic/user-provided strings remain unchanged.
 - Android Back dismisses the logout dialog, pops an in-app screen, returns a root Profile/Notifications screen to Home, or exits from root Home/Login.
-- The Expo Notifications client configures the Android channel, handles foreground notifications and routes validated notification taps. This repository has no authenticated production login or notification backend, so it does not request/register a device token or claim server delivery. `registerPushTokenWithBackend` is an adapter for a future authenticated HTTPS `POST /v1/device-tokens` service; it requires a real access token and must be called from the production authentication flow. The request body is `{ "token": "<Expo push token>", "platform": "android" | "ios" }`; the service must authenticate the bearer token, associate the token with that authenticated guardian, and return a 2xx status on success. No access token or backend URL is bundled in the demo.
+- Notifications in this demo are in-app records only; native push delivery is not configured. `registerPushTokenWithBackend` accepts a device token from a future native push provider and posts it to an authenticated HTTPS `POST /v1/device-tokens` service. The service must authenticate the bearer token, associate the token with that guardian, and return a 2xx status on success. No access token, push provider or backend URL is bundled in the demo.
 - The app’s toast overlay is local UI feedback; it is separate from operating-system push notifications.
 
 ## Android package-size audit
 
-No APK or AAB is checked into this workspace, so installed/package size and per-module size savings have not been measured. The final Expo Android export produced a 2,192,499-byte Hermes JavaScript bundle (Expo reports 2.2 MB) and one 38,781-byte school image. These are only bundle/export figures, not the final APK/AAB or installed size. Measure the release APK/AAB from the actual Android build pipeline before reporting a size target or savings; do not use the JavaScript dependency tree or raw asset sizes as a substitute for the packaged artifact.
+No React Native CLI APK or AAB is checked into this workspace, so release package size and per-module size savings have not been measured. Measure the release APK/AAB from the actual Android build pipeline before reporting a size target or savings; do not use the JavaScript dependency tree or raw asset sizes as a substitute for the packaged artifact.
 
 ## Limitations (intentional for the requested scope)
 

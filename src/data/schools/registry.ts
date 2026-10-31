@@ -1,10 +1,6 @@
-import activeSchool from "./active-school.json";
 import greenwoodApp from "./greenwood-demo/app-config.json";
-import greenwoodMedia from "./greenwood-demo/media.json";
-import greenwoodSchool from "./greenwood-demo/school.json";
 import greenwoodTeachers from "./greenwood-demo/teachers.json";
-import greenwoodTheme from "./greenwood-demo/theme.json";
-import { bundledSchoolAssets } from "./greenwood-demo/assets";
+import { getSchoolConfiguration } from "../../config/schoolConfig";
 import type {
   AppConfiguration,
   SchoolConfiguration,
@@ -24,51 +20,47 @@ type UnresolvedSchoolConfiguration = Omit<
     };
   };
   theme: Omit<SchoolTheme, "defaultMode"> & { defaultMode: string };
-  media: Omit<SchoolMediaConfig, "logo"> & {
-    logo: { kind: string; assetKey: string; altText: string };
-  };
+  media: SchoolMediaConfig;
 };
 
 type RegisteredSchoolId = "greenwood-demo";
+const sharedSchool = getSchoolConfiguration();
 
 const schoolRegistry: Record<RegisteredSchoolId, UnresolvedSchoolConfiguration> = {
   "greenwood-demo": {
-    school: greenwoodSchool,
+    school: {
+      ...sharedSchool.school,
+      id: sharedSchool.schoolId,
+      defaultAcademicYear: sharedSchool.academic.defaultAcademicYear,
+      availableAcademicYears: sharedSchool.academic.availableAcademicYears,
+    },
     app: greenwoodApp,
-    theme: greenwoodTheme,
-    media: greenwoodMedia,
+    theme: sharedSchool.theme,
+    media: {
+      coverImage: sharedSchool.media.coverImages[0],
+      photos: sharedSchool.media.galleryImages,
+      videos: sharedSchool.media.videos,
+    },
     teachers: greenwoodTeachers,
   },
 };
 
 function resolveActiveSchool(): SchoolConfiguration {
-  const config = Object.entries(schoolRegistry).find(
-    ([schoolId]) => schoolId === activeSchool.schoolId,
-  )?.[1];
-  if (!config) {
-    throw new Error(`No school configuration registered for "${activeSchool.schoolId}".`);
+  const registeredSchoolId: RegisteredSchoolId = "greenwood-demo";
+  if (sharedSchool.schoolId !== registeredSchoolId) {
+    throw new Error(`No school configuration registered for "${sharedSchool.schoolId}".`);
   }
-  if (config.school.id !== activeSchool.schoolId) {
-    throw new Error(
-      `Active school ID "${activeSchool.schoolId}" does not match the registered school ID "${config.school.id}".`,
-    );
+  const config = schoolRegistry[registeredSchoolId];
+  if (config.school.id !== sharedSchool.schoolId) {
+    throw new Error(`School ID "${config.school.id}" does not match shared school ID "${sharedSchool.schoolId}".`);
   }
   const defaultMode = config.theme.defaultMode;
   if (defaultMode !== "light" && defaultMode !== "dark") {
     throw new Error(`Unsupported default appearance mode "${defaultMode}".`);
   }
-  if (config.media.logo.kind !== "bundled") {
-    throw new Error(`Unsupported logo source type "${config.media.logo.kind}".`);
-  }
   const splashResizeMode = config.app.splash.android.resizeMode;
   if (splashResizeMode !== "contain" && splashResizeMode !== "cover") {
     throw new Error(`Unsupported Android splash resize mode "${splashResizeMode}".`);
-  }
-  const logoSource = bundledSchoolAssets[config.media.logo.assetKey];
-  if (!logoSource) {
-    throw new Error(
-      `No bundled image asset is registered for school logo "${config.media.logo.assetKey}".`,
-    );
   }
   return {
     ...config,
@@ -82,10 +74,6 @@ function resolveActiveSchool(): SchoolConfiguration {
       },
     },
     theme: { ...config.theme, defaultMode },
-    media: {
-      ...config.media,
-      logo: { ...config.media.logo, kind: "bundled", source: logoSource },
-    },
   };
 }
 

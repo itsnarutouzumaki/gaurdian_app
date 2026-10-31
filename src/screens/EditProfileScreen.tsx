@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Pressable, View } from "react-native";
-import * as ImagePicker from "expo-image-picker";
+import ImageCropPicker from "react-native-image-crop-picker";
 import { useApp, useAppAlert } from "../app-context";
 import {
   ActionButton,
@@ -37,24 +37,24 @@ export function EditProfileScreen() {
     (currentRoute.params?.missingFields as string[] | undefined) || [];
   const choosePhoto = async () => {
     try {
-      const permission =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (!permission.granted) {
-        Alert.alert(
-          "Photo permission needed",
-          "Allow photo-library access to choose your profile picture.",
-        );
+      const result = await ImageCropPicker.openPicker({
+        mediaType: "photo",
+        cropping: true,
+        width: 512,
+        height: 512,
+        compressImageQuality: 0.85,
+      });
+      setPhoto(result.path);
+    } catch (error) {
+      if (
+        typeof error === "object" &&
+        error !== null &&
+        "code" in error &&
+        error.code === "E_PICKER_CANCELLED"
+      ) {
         return;
       }
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ["images"],
-        allowsEditing: true,
-        aspect: [1, 1],
-        quality: 0.85,
-      });
-      if (!result.canceled && result.assets?.[0])
-        setPhoto(result.assets[0].uri);
-    } catch {
+      console.error("Unable to open the native photo picker.", error);
       Alert.alert(
         "Photo picker unavailable",
         "Use one of the sample portraits below to finish the UI test.",

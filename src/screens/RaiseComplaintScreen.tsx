@@ -1,6 +1,11 @@
 import React, { useState } from "react";
 import { Pressable, View } from "react-native";
-import * as DocumentPicker from "expo-document-picker";
+import {
+  errorCodes,
+  isErrorWithCode,
+  pick,
+  types,
+} from "@react-native-documents/picker";
 import { useApp, useAppAlert } from "../app-context";
 import {
   ActionButton,
@@ -47,17 +52,23 @@ export function RaiseComplaintScreen() {
   const subjects = year.subjects.map((s) => s.name);
   const pickAttachment = async () => {
     try {
-      const result = await DocumentPicker.getDocumentAsync({
-        type: ["application/pdf", "image/*"],
-        multiple: false,
-        copyToCacheDirectory: true,
+      const [result] = await pick({
+        type: [types.pdf, types.images],
+        allowMultiSelection: false,
       });
-      if (!result.canceled && result.assets?.[0])
-        setAttachment({
-          name: result.assets[0].name,
-          uri: result.assets[0].uri,
-        });
-    } catch {
+      if (!result) return;
+      setAttachment({
+        name: result.name || result.uri.split("/").pop() || "Attachment",
+        uri: result.uri,
+      });
+    } catch (error) {
+      if (
+        isErrorWithCode(error) &&
+        error.code === errorCodes.OPERATION_CANCELED
+      ) {
+        return;
+      }
+      console.error("Unable to open the native attachment picker.", error);
       Alert.alert(
         "Attachment picker",
         "The document picker could not be opened. You can still submit the complaint without an attachment.",

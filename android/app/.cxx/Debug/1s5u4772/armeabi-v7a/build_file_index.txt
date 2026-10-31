@@ -1,0 +1,6 @@
+F:\school App\parent\node_modules\@react-native-async-storage\async-storage\android\build\generated\source\codegen\jni\CMakeLists.txt
+F:\school App\parent\node_modules\@react-native-documents\picker\android\build\generated\source\codegen\jni\CMakeLists.txt
+F:\school App\parent\node_modules\react-native-image-crop-picker\android\build\generated\source\codegen\jni\CMakeLists.txt
+F:\school App\parent\node_modules\react-native-safe-area-context\android\src\main\jni\CMakeLists.txt
+F:\school App\parent\node_modules\react-native-share\android\build\generated\source\codegen\jni\CMakeLists.txt
+F:\school App\parent\node_modules\react-native\ReactAndroid\cmake-utils\default-app-setup\CMakeLists.txt

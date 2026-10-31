@@ -19,8 +19,8 @@ try {
   const navigation = require(path.join(temp, 'back-navigation.js'));
   const { parsePushTapPayload } = require(path.join(temp, 'push-payload.js'));
   const mock = JSON.parse(fs.readFileSync(path.join(root, 'src/data/mock-data.json'), 'utf8'));
-  const activeSchool = JSON.parse(fs.readFileSync(path.join(root, 'src/data/schools/active-school.json'), 'utf8'));
-  const teachers = JSON.parse(fs.readFileSync(path.join(root, 'src/data/schools', activeSchool.schoolId, 'teachers.json'), 'utf8'));
+  const shared = JSON.parse(fs.readFileSync(path.resolve(root, '..', 'shared/school-config.json'), 'utf8'));
+  const teachers = JSON.parse(fs.readFileSync(path.join(root, 'src/data/schools', shared.schoolId, 'teachers.json'), 'utf8'));
   const complete = mock.guardian;
   assert.equal(format.isProfileComplete(complete), true);
   assert.equal(format.isProfileComplete({ ...complete, fullName: '' }), false);

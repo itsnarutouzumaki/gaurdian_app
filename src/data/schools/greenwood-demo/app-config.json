@@ -1,5 +1,4 @@
 {
-  "appName": "Greenwood International School",
   "slug": "greenwood-international-school",
   "scheme": "greenwood-international-school",
   "version": "1.0.0",
@@ -7,16 +6,14 @@
   "android": {
     "package": "com.greenwoodinternational.guardian",
     "adaptiveIcon": {
-      "foregroundImage": "./assets/greenwood-guardian-adaptive.png",
-      "backgroundColor": "#073C88"
+      "foregroundImage": "./assets/greenwood-guardian-adaptive.png"
     }
   },
   "splash": {
     "android": {
-      "image": "./assets/mnnit-logo-white.png",
+      "image": "./assets/school-splash.png",
       "imageWidth": 240,
-      "resizeMode": "contain",
-      "backgroundColor": "#073C88"
+      "resizeMode": "contain"
     }
   },
   "ios": {

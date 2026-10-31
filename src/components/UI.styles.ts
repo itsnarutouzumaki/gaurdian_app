@@ -118,6 +118,7 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     paddingBottom: 4,
   },
+  bottomTabsSafeArea: { backgroundColor: "#FFFFFF" },
   tabButton: {
     flex: 1,
     alignItems: "center",
@@ -196,6 +197,7 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: 25,
   },
+  modalSafe: { flex: 1 },
   modalCard: {
     backgroundColor: "#FFFFFF",
     borderRadius: 20,

@@ -194,6 +194,7 @@ try {
     compilerOptions: {
       module: ts.ModuleKind.CommonJS,
       target: ts.ScriptTarget.ES2022,
+      esModuleInterop: true,
     },
   });
   const modulePath = path.join(temp, 'i18n.js');

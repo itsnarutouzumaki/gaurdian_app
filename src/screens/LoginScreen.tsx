@@ -20,7 +20,7 @@ export function LoginScreen() {
   return (
     <Page title="Welcome back" subtitle={school.name} onBack={goBack}>
       <View style={styles.header}>
-        <SchoolMark size={66} style={styles.logoMark} />
+        <SchoolMark size={88} style={styles.logoMark} />
         <AppText size={22} weight="bold" style={styles.title}>
           Login to your account
         </AppText>

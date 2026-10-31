@@ -1,5 +1,5 @@
-import { File, Paths } from "expo-file-system";
-import * as Sharing from "expo-sharing";
+import RNFS from "react-native-fs";
+import Share from "react-native-share";
 import type { ToastMessage } from "../types";
 
 const cleanAscii = (value: string) => value.normalize('NFKD').replace(/[^\x20-\x7E]/g, ' ');
@@ -51,25 +51,14 @@ export async function shareDemoPdf(
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-|-$/g, "")
         .slice(0, 45) || "school-document";
-    const file = new File(
-      Paths.document,
-      `${safeName}-${Date.now()}.pdf`,
-    );
-    file.create();
-    await file.write(makeOnePagePdf(title, lines));
-    if (await Sharing.isAvailableAsync()) {
-      await Sharing.shareAsync(file.uri, {
-        mimeType: "application/pdf",
-        dialogTitle: "Open or save PDF",
-        UTI: "com.adobe.pdf",
-      });
-    } else {
-      notify({
-        title: "PDF created",
-        message: `A demo PDF was created at: ${file.uri}`,
-        tone: "success",
-      });
-    }
+    const filePath = `${RNFS.DocumentDirectoryPath}/${safeName}-${Date.now()}.pdf`;
+    await RNFS.writeFile(filePath, makeOnePagePdf(title, lines), "utf8");
+    await Share.open({
+      url: `file://${filePath}`,
+      type: "application/pdf",
+      title,
+      failOnCancel: false,
+    });
   } catch (error) {
     console.error("Unable to create or share the demo PDF.", error);
     notify({

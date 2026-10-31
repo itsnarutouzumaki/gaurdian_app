@@ -1,9 +1,12 @@
 node_modules/
-.expo/
 dist/
-web-build/
 *.log
 .DS_Store
-android/
-ios/
 .venv/
+android/.gradle/
+android/app/build/
+android/build/
+android/local.properties
+ios/Pods/
+ios/build/
+ios/*.xcworkspace/

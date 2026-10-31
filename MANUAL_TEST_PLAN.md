@@ -1,6 +1,6 @@
 # Guardian App — Manual UI Test Plan
 
-Run the app with `npm install`, `npx expo install --fix`, then `npm start`. These tests use synthetic local JSON data; they do not require a backend.
+Run the app with `npm install`, `npm run config:apply`, `npm start` and, in a second terminal, `npm run android`. These tests use synthetic local JSON data; they do not require a backend.
 
 ## 1. Sign-in and main navigation
 
@@ -9,6 +9,7 @@ Run the app with `npm install`, `npx expo install --fix`, then `npm start`. Thes
 - [ ] Home, Notifications and Profile bottom tabs replace the current tab stack without duplicating screens.
 - [ ] Logout opens a confirmation dialog. Cancel keeps the session; Logout returns to Login.
 - [ ] On Android, Back dismisses the logout dialog first, pops a nested screen, returns Profile/Notifications roots to Home, and exits from root Home/Login.
+- [ ] On a phone with a notch or punch-hole camera and gesture navigation, the status bar, page title, tabs and toast remain clear of system cutouts and navigation controls.
 
 ## 2. Home and linked children
 
@@ -70,6 +71,6 @@ Run the app with `npm install`, `npx expo install --fix`, then `npm start`. Thes
 
 - [ ] Build and install a fresh Android APK after changing `app-config.json`; confirm the launcher uses the configured provisional GI monogram and the launch screen uses the configured splash logo on `#073C88`.
 - [ ] Confirm the provisional icon is replaced with approved Greenwood artwork before any production release.
-- [ ] The app can process an Expo notification tap whose data includes an allowed `route`; invalid routes and unknown child IDs must not navigate. Production delivery/token registration is not testable until an authenticated backend is configured.
-- [ ] Verify the local toast overlay remains separate from system push notifications.
+- [ ] In-app demo notifications remain usable. Native push delivery/token registration is not configured in this build.
+- [ ] Verify the local toast overlay remains separate from OS notifications.
 - [ ] Record the built release APK/AAB size from the actual build artifact and attach the artifact/build variant to the audit. Do not infer package size from source assets or installed npm modules.

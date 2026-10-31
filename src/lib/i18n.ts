@@ -283,6 +283,7 @@ const hindi: Readonly<Record<string, string>> = {
   Home: "होम",
   Profile: "प्रोफ़ाइल",
   "Push registration requires an authenticated access token.": "पुश पंजीकरण के लिए प्रमाणित एक्सेस टोकन आवश्यक है।",
+  "Push registration requires a native device token.": "पुश पंजीकरण के लिए नेटिव डिवाइस टोकन आवश्यक है।",
   "Push token registration is supported only on Android and iOS.": "पुश टोकन पंजीकरण केवल Android और iOS पर समर्थित है।",
   "Push registration requires HTTPS outside local development.": "स्थानीय विकास के बाहर पुश पंजीकरण के लिए HTTPS आवश्यक है।",
   "Please complete your profile first": "पहले अपनी प्रोफ़ाइल पूरी करें",

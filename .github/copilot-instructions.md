@@ -58,7 +58,7 @@ Every source file must have **one clear primary responsibility**.
 ### Lib, data, and types
 
 - `src/lib/` is for pure helpers already present: `format.ts`, `selectors.ts`, `calendar.ts`, `notifications.ts`, `pdf.ts`. Reuse them instead of duplicating (Attendance currently rebuilds a calendar grid instead of calling `createCalendarGrid`; `monthTitle` exists in `format.ts`).
-- `src/data/mock-data.json` is the source of guardian/student operational demo content. School-specific identity, app metadata, theme, media and teachers live under `src/data/schools/<school-id>/`; `active-school.json` selects the school and `registry.ts` is the only runtime selector. Do not reshape these sources during unrelated refactors.
+- `src/data/mock-data.json` is the source of guardian/student operational demo content. School-wide identity, theme, academic defaults, media and localization live in `../shared/school-config.json`, accessed through `src/config/schoolConfig.ts`. App-specific native settings remain under `src/data/schools/<school-id>/`; teacher records there are demo operational data, not shared school configuration.
 - `src/data/screen-options.ts` holds static screen option lists (filters, tabs, profile menu). Keep that role.
 - `src/types.ts` is the domain type source. Prefer tightening `any` with real types over introducing new wrapper types.
 - `src/app-context.tsx` only defines `AppContextValue`, the provider, and `useApp`. App state construction stays in `App.tsx`.
@@ -162,7 +162,7 @@ Product docs: `README.md`, `MANUAL_TEST_PLAN.md`. Treat the manual test plan as 
 Recorded during the architecture audit. Later phases must not hide these by skipping checks.
 
 - The school-configuration migration keeps school branding in `src/data/schools/`; `mock-data.json` contains operational demo data only, with canonical teachers in the active school’s `teachers.json`.
-- The school logo is a UI image configured through `media.json` and the school’s statically resolvable `assets.ts` map; never use it as the launcher icon unless an explicit native icon path is configured in `app-config.json`.
+- The owner-provided school logo at `../shared/assets/logo.png` is shared by both apps. UI components and committed native launcher assets use that same source. Do not substitute another image.
 - Only `greenwood-demo` is currently registered. Do not create additional school records or theme variants without supplied data; the dark palette remains unavailable until real colors are provided.
 - The logo asset currently shown for this demo is the temporary MNNIT logo requested by the user. A Greenwood-owned logo has not been supplied.
 

@@ -4,8 +4,8 @@ import { C } from "../theme";
 export const styles = StyleSheet.create({
   header: { alignItems: "center", marginTop: 10, marginBottom: 8 },
   logoMark: {
-    width: 66,
-    height: 66,
+    width: 88,
+    height: 88,
     borderRadius: 22,
     backgroundColor: C.primaryDark,
     alignItems: "center",
