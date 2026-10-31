@@ -1,4 +1,0 @@
-F:/school App/parent/android/app/.cxx/RelWithDebInfo/5j5u5w64/arm64-v8a/CMakeFiles/_CMakeLTOTest-CXX/bin/CMakeFiles/foo.dir
-F:/school App/parent/android/app/.cxx/RelWithDebInfo/5j5u5w64/arm64-v8a/CMakeFiles/_CMakeLTOTest-CXX/bin/CMakeFiles/boo.dir
-F:/school App/parent/android/app/.cxx/RelWithDebInfo/5j5u5w64/arm64-v8a/CMakeFiles/_CMakeLTOTest-CXX/bin/CMakeFiles/edit_cache.dir
-F:/school App/parent/android/app/.cxx/RelWithDebInfo/5j5u5w64/arm64-v8a/CMakeFiles/_CMakeLTOTest-CXX/bin/CMakeFiles/rebuild_cache.dir
