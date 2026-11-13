@@ -67,6 +67,12 @@ export const styles = StyleSheet.create({
     color: C.text,
     minWidth: 0,
   },
+  passwordVisibilityButton: {
+    width: 36,
+    height: 40,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   avatar: {
     backgroundColor: C.blueSoft,
     alignItems: "center",

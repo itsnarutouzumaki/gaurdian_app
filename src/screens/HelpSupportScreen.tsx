@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View } from "react-native";
 import { useApp, useAppAlert } from "../app-context";
-import { translate } from "../lib/i18n";
+import { getSchoolConfiguration } from "../config/schoolConfig";
 import {
   ActionButton,
   AppText,
@@ -12,21 +12,14 @@ import {
   SectionTitle,
 } from "../components/UI";
 import { C } from "../theme";
-import mock from "../data/mock-data.json";
-import type { HelpTopic } from "../types";
 import { styles } from "./HelpSupportScreen.styles";
 
 export function HelpSupportScreen() {
   const Alert = useAppAlert();
   const { navigate, goBack, school, language } = useApp();
-  const topics: HelpTopic[] = mock.helpTopics;
+  const topics = getSchoolConfiguration().guardianContent.helpTopics[language];
   const [opened, setOpened] = useState<string | null>(null);
   const [query, setQuery] = useState("");
-  const filtered = topics.filter((item) =>
-    `${translate(item.title, language)} ${translate(item.body, language)}`
-      .toLowerCase()
-      .includes(query.toLowerCase()),
-  );
   return (
     <Page
       title="Help & Support"
@@ -40,52 +33,66 @@ export function HelpSupportScreen() {
           onChangeText={setQuery}
           placeholder="Search FAQs..."
         />
-        <View style={styles.contactRow}>
-          <ActionButton
-            title="Call school"
-            icon="☎"
-            variant="secondary"
-            onPress={() => Alert.alert("School phone", school.phone)}
-            style={styles.contactButton}
-          />
-          <ActionButton
-            title="Email school"
-            icon="✉"
-            variant="outline"
-            onPress={() => Alert.alert("School email", school.email)}
-            style={styles.contactButton}
-          />
-        </View>
+        {school.phone || school.email ? (
+          <View style={styles.contactRow}>
+            {school.phone ? (
+              <ActionButton
+                title="Call school"
+                icon="☎"
+                variant="secondary"
+                onPress={() => Alert.alert("School phone", school.phone)}
+                style={styles.contactButton}
+              />
+            ) : null}
+            {school.email ? (
+              <ActionButton
+                title="Email school"
+                icon="✉"
+                variant="outline"
+                onPress={() => Alert.alert("School email", school.email)}
+                style={styles.contactButton}
+              />
+            ) : null}
+          </View>
+        ) : (
+          <AppText size={11} color={C.muted} style={styles.contactRow}>
+            School contact details are not available.
+          </AppText>
+        )}
       </Card>
       <SectionTitle title="Frequently asked questions" />
-      {filtered.map((topic) => (
-        <Card
-          key={topic.id}
-          padding={13}
-          onPress={() => setOpened(opened === topic.id ? null : topic.id)}
-        >
-          <View style={styles.topicRow}>
-            <View style={styles.topicIcon}>
-              <AppText color={C.primary} weight="bold">
-                i
+      {topics
+        .filter((topic) =>
+          `${topic.title} ${topic.body}`.toLowerCase().includes(query.toLowerCase()),
+        )
+        .map((topic) => (
+          <Card
+            key={topic.id}
+            padding={13}
+            onPress={() => setOpened(opened === topic.id ? null : topic.id)}
+          >
+            <View style={styles.topicRow}>
+              <View style={styles.topicIcon}>
+                <AppText color={C.primary} weight="bold">
+                  i
+                </AppText>
+              </View>
+              <View style={styles.flex}>
+                <AppText size={13} weight="semibold">
+                  {topic.title}
+                </AppText>
+              </View>
+              <AppText size={19} color={C.muted}>
+                {opened === topic.id ? "−" : "+"}
               </AppText>
             </View>
-            <View style={styles.flex}>
-              <AppText size={13} weight="semibold">
-                {topic.title}
+            {opened === topic.id ? (
+              <AppText size={12} color={C.muted} style={styles.answer}>
+                {topic.body}
               </AppText>
-            </View>
-            <AppText size={19} color={C.muted}>
-              {opened === topic.id ? "−" : "+"}
-            </AppText>
-          </View>
-          {opened === topic.id ? (
-            <AppText size={12} color={C.muted} style={styles.answer}>
-              {topic.body}
-            </AppText>
-          ) : null}
-        </Card>
-      ))}
+            ) : null}
+          </Card>
+        ))}
       <Card padding={14}>
         <AppText size={13} weight="bold">
           Need more help?

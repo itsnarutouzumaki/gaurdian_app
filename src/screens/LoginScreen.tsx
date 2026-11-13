@@ -10,13 +10,16 @@ import {
   SchoolMark,
 } from "../components/UI";
 import { C } from "../theme";
+import { loginGuardian } from "../services/auth-api";
+import { loadGuardianAppData } from "../services/guardian-data/load-guardian-app-data";
 import { styles } from "./LoginScreen.styles";
 
 export function LoginScreen() {
   const Alert = useAppAlert();
-  const { school, navigate, signIn, goBack } = useApp();
-  const [mobile, setMobile] = useState("9876543210");
-  const [password, setPassword] = useState("Demo@123");
+  const { school, navigate, signIn, goBack, showToast } = useApp();
+  const [mobile, setMobile] = useState("");
+  const [password, setPassword] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   return (
     <Page title="Welcome back" subtitle={school.name} onBack={goBack}>
       <View style={styles.header}>
@@ -30,7 +33,7 @@ export function LoginScreen() {
           align="center"
           style={styles.subtitle}
         >
-          Use the seeded demo guardian profile to explore the app.
+          Sign in with your registered mobile number.
         </AppText>
       </View>
       <Card padding={18}>
@@ -60,7 +63,9 @@ export function LoginScreen() {
         </Pressable>
         <ActionButton
           title="Login"
-          onPress={() => {
+          loading={submitting}
+          disabled={submitting}
+          onPress={async () => {
             if (!mobile.trim() || !password.trim()) {
               Alert.alert(
                 "Required fields",
@@ -68,25 +73,30 @@ export function LoginScreen() {
               );
               return;
             }
-            signIn();
+            setSubmitting(true);
+            try {
+              const result = await loginGuardian({
+                phone: mobile.trim(),
+                password,
+              });
+              if (result.passwordChangeRequired) {
+                navigate("ChangePassword", {
+                  passwordChangeToken: result.accessToken,
+                });
+                return;
+              }
+              const guardianData = await loadGuardianAppData();
+              signIn(guardianData);
+            } catch (error) {
+              showToast({
+                title: "Unable to sign in",
+                message: error instanceof Error ? error.message : "Please try again.",
+                tone: "error",
+              });
+            } finally {
+              setSubmitting(false);
+            }
           }}
-        />
-        <View style={styles.dividerRow}>
-          <View style={styles.dividerLine} />
-          <AppText size={11} color={C.muted}>
-            OR
-          </AppText>
-          <View style={styles.dividerLine} />
-        </View>
-        <ActionButton
-          title="Continue with OTP"
-          variant="outline"
-          onPress={() =>
-            Alert.alert(
-              "Demo OTP",
-              "For UI testing, use the Login button. OTP delivery is not connected in this frontend-only build.",
-            )
-          }
         />
       </Card>
       <View style={styles.signupRow}>
@@ -99,21 +109,6 @@ export function LoginScreen() {
           </AppText>
         </Pressable>
       </View>
-      <InfoDemo />
     </Page>
-  );
-}
-
-export function InfoDemo() {
-  return (
-    <View style={styles.demoBanner}>
-      <AppText size={11} color={C.primary} weight="semibold">
-        Demo credentials are prefilled
-      </AppText>
-      <AppText size={11} color={C.muted} style={styles.demoCopy}>
-        No real authentication or backend is used. Any non-empty mobile number
-        and password will open the sample app.
-      </AppText>
-    </View>
   );
 }

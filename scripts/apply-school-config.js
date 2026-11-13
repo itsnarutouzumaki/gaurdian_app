@@ -6,12 +6,8 @@ const shared = JSON.parse(
   fs.readFileSync(path.resolve(root, "..", "shared", "school-config.json"), "utf8"),
 );
 const school = shared.school;
-const config = JSON.parse(
-  fs.readFileSync(
-    path.join(root, "src", "data", "schools", "greenwood-demo", "app-config.json"),
-    "utf8",
-  ),
-);
+const config = shared.parentApp;
+const sharedRoot = path.resolve(root, "..", "shared");
 const theme = shared.theme;
 const appPath = path.join(root, "app.json");
 const app = JSON.parse(fs.readFileSync(appPath, "utf8"));
@@ -78,7 +74,7 @@ const androidAdaptiveIconPath = path.join(
 const iosIconPath = path.join(
   root,
   "ios",
-  "GreenwoodGuardian",
+  "TestInternationalGuardian",
   "Images.xcassets",
   "AppIcon.appiconset",
   "AppIcon.png",
@@ -86,14 +82,14 @@ const iosIconPath = path.join(
 const iosProjectPath = path.join(
   root,
   "ios",
-  "GreenwoodGuardian.xcodeproj",
+  "TestInternationalGuardian.xcodeproj",
   "project.pbxproj",
 );
-const iosInfoPath = path.join(root, "ios", "GreenwoodGuardian", "Info.plist");
+const iosInfoPath = path.join(root, "ios", "TestInternationalGuardian", "Info.plist");
 const iosLaunchPath = path.join(
   root,
   "ios",
-  "GreenwoodGuardian",
+  "TestInternationalGuardian",
   "LaunchScreen.storyboard",
 );
 
@@ -104,15 +100,15 @@ for (const [name, value] of Object.entries({
   version: config.version,
 })) {
   if (typeof value !== "string" || value.trim() === "") {
-    throw new Error(`The active school's app-config.json is missing ${name}.`);
+    throw new Error(`The shared Parent app configuration is missing ${name}.`);
   }
 }
 
 function ensureConfiguredAsset(relativePath, label) {
   if (typeof relativePath !== "string" || relativePath.trim() === "") return;
-  const assetPath = path.resolve(root, relativePath);
+  const assetPath = path.resolve(sharedRoot, relativePath);
   if (!fs.existsSync(assetPath)) {
-    throw new Error(`Configured ${label} does not exist: ${relativePath}`);
+    throw new Error(`Configured shared ${label} does not exist: ${relativePath}`);
   }
 }
 
@@ -136,7 +132,7 @@ ensureConfiguredAsset(config.icon, "app icon");
 ensureConfiguredAsset(config.android.adaptiveIcon.foregroundImage, "Android adaptive icon");
 ensureConfiguredAsset(config.splash?.android?.image, "Android splash image");
 
-app.name = "GreenwoodGuardian";
+app.name = config.name;
 app.displayName = school.name;
 fs.writeFileSync(appPath, `${JSON.stringify(app, null, 2)}\n`);
 
@@ -199,19 +195,19 @@ androidStyles = updatedAndroidStyles;
 fs.writeFileSync(androidStylesPath, androidStyles);
 fs.mkdirSync(path.dirname(androidSplashPath), { recursive: true });
 fs.copyFileSync(
-  path.resolve(root, config.splash.android.image),
+  path.resolve(sharedRoot, config.splash.android.image),
   androidSplashPath,
 );
 for (const directory of androidIconDirectories) {
   const iconPath = path.join(directory, "ic_launcher.png");
-  fs.copyFileSync(path.resolve(root, config.icon), iconPath);
-  fs.copyFileSync(path.resolve(root, config.icon), path.join(directory, "ic_launcher_round.png"));
+  fs.copyFileSync(path.resolve(sharedRoot, config.icon), iconPath);
+  fs.copyFileSync(path.resolve(sharedRoot, config.icon), path.join(directory, "ic_launcher_round.png"));
 }
 fs.copyFileSync(
-  path.resolve(root, config.android.adaptiveIcon.foregroundImage),
+  path.resolve(sharedRoot, config.android.adaptiveIcon.foregroundImage),
   androidAdaptiveIconPath,
 );
-fs.copyFileSync(path.resolve(root, config.icon), iosIconPath);
+fs.copyFileSync(path.resolve(sharedRoot, config.icon), iosIconPath);
 
 let iosProject = fs.readFileSync(iosProjectPath, "utf8");
 iosProject = replaceRequired(

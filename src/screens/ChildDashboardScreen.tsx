@@ -44,7 +44,7 @@ export function ChildDashboardScreen() {
               {year.className} · Section {year.section}
             </AppText>
             <AppText size={10} color={C.muted} style={styles.meta}>
-              Student ID: {child.studentId}
+              Student number: {child.studentId}
             </AppText>
           </View>
           <Badge label="Linked" tone="green" />

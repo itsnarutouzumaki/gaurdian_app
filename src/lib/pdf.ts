@@ -1,69 +1,95 @@
+import { generatePDF } from "react-native-html-to-pdf";
 import RNFS from "react-native-fs";
+import { NativeModules, PermissionsAndroid, Platform } from "react-native";
 import Share from "react-native-share";
 import type { ToastMessage } from "../types";
 
-const cleanAscii = (value: string) => value.normalize('NFKD').replace(/[^\x20-\x7E]/g, ' ');
-const escapePdf = (value: string) => cleanAscii(value).replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)');
+type PdfDownloadNativeModule = {
+  savePdfToDownloads(sourcePath: string, fileName: string): Promise<string>;
+};
 
-function makeOnePagePdf(title: string, lines: string[]) {
-  const streamLines = [
-    "BT",
-    "/F1 18 Tf",
-    "50 790 Td",
-    `(${escapePdf(title)}) Tj`,
-    "/F1 10 Tf",
-    "0 -28 Td",
-    ...lines.flatMap((line) => [`(${escapePdf(line)}) Tj`, "0 -17 Td"]),
-    "ET",
-  ];
-  const stream = streamLines.join("\n");
-  const objects = [
-    "<< /Type /Catalog /Pages 2 0 R >>",
-    "<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
-    "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 842] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>",
-    "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",
-    `<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`,
-  ];
-  let pdf = "%PDF-1.4\n";
-  const offsets = [0];
-  objects.forEach((object, index) => {
-    offsets.push(pdf.length);
-    pdf += `${index + 1} 0 obj\n${object}\nendobj\n`;
-  });
-  const xrefOffset = pdf.length;
-  pdf += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
-  offsets.slice(1).forEach((offset) => {
-    pdf += `${String(offset).padStart(10, "0")} 00000 n \n`;
-  });
-  pdf += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
-  return pdf;
+const pdfDownloadModule =
+  NativeModules.PdfDownloadModule as PdfDownloadNativeModule | undefined;
+
+function messageFromError(error: unknown) {
+  return error instanceof Error ? error.message : String(error);
 }
 
-export async function shareDemoPdf(
+function safeFileName(value: string) {
+  return (
+    value
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "")
+      .slice(0, 45) || "school-document"
+  );
+}
+
+export async function sharePdfDocument(
   title: string,
-  lines: string[],
+  html: string,
   notify: (toast: ToastMessage) => void,
 ) {
+  const fileName = `${safeFileName(title)}-${Date.now()}-${Math.random()
+    .toString(36)
+    .slice(2, 8)}`;
+
   try {
-    const safeName =
-      title
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-|-$/g, "")
-        .slice(0, 45) || "school-document";
-    const filePath = `${RNFS.DocumentDirectoryPath}/${safeName}-${Date.now()}.pdf`;
-    await RNFS.writeFile(filePath, makeOnePagePdf(title, lines), "utf8");
+    if (Platform.OS === "android" && !pdfDownloadModule) {
+      throw new Error("PDF downloads are not available right now.");
+    }
+    if (
+      Platform.OS === "android" &&
+      Number(Platform.Version) < 29
+    ) {
+      const permission = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+      );
+      if (permission !== PermissionsAndroid.RESULTS.GRANTED) {
+        notify({
+          title: "Storage permission required",
+          message: "Allow storage access to save the PDF in Downloads.",
+          tone: "error",
+        });
+        return;
+      }
+    }
+
+    const generated = await generatePDF({
+      html,
+      fileName,
+      shouldPrintBackgrounds: true,
+    });
+    if (!generated.filePath || !(await RNFS.exists(generated.filePath))) {
+      throw new Error("The PDF generator did not create an output file.");
+    }
+
+    const savedFile = await RNFS.stat(generated.filePath);
+    if (Number(savedFile.size) <= 0) {
+      throw new Error("The generated PDF is empty.");
+    }
+
+    if (Platform.OS === "android") {
+      await pdfDownloadModule!.savePdfToDownloads(generated.filePath, fileName);
+      notify({
+        title: "PDF downloaded",
+        message: `${fileName}.pdf saved to Downloads/Parent App.`,
+        tone: "success",
+      });
+      return;
+    }
+
     await Share.open({
-      url: `file://${filePath}`,
+      url: `file://${generated.filePath}`,
       type: "application/pdf",
       title,
       failOnCancel: false,
     });
   } catch (error) {
-    console.error("Unable to create or share the demo PDF.", error);
+    console.error("Unable to generate, download, or share the PDF.", error);
     notify({
-      title: "PDF unavailable",
-      message: "Unable to create the sample PDF.",
+      title: Platform.OS === "android" ? "PDF download failed" : "PDF unavailable",
+      message: messageFromError(error),
       tone: "error",
     });
   }

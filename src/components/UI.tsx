@@ -18,6 +18,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useLanguage } from "../app-context";
 import { translate } from "../lib/i18n";
 import { useTranslation } from "react-i18next";
+import Svg, { Circle, Path } from "react-native-svg";
 import { C, R } from "../theme";
 import { initials } from "../lib/format";
 import { getSchoolConfiguration } from "../config/schoolConfig";
@@ -370,6 +371,7 @@ export function Field({
   autoCapitalize?: "none" | "sentences" | "words" | "characters";
 }) {
   const language = useLanguage();
+  const [passwordVisible, setPasswordVisible] = useState(false);
   return (
     <View style={styles.field}>
       <AppText
@@ -398,7 +400,7 @@ export function Field({
           editable={editable}
           multiline={multiline}
           keyboardType={keyboardType}
-          secureTextEntry={secureTextEntry}
+          secureTextEntry={secureTextEntry && !passwordVisible}
           autoCapitalize={autoCapitalize}
           style={[
             styles.input,
@@ -406,6 +408,57 @@ export function Field({
             !editable && { color: C.muted },
           ]}
         />
+        {secureTextEntry ? (
+          <Pressable
+            onPress={() => setPasswordVisible((visible) => !visible)}
+            accessibilityRole="button"
+            accessibilityLabel={translate(
+              passwordVisible ? "Hide password" : "Show password",
+              language,
+            )}
+            accessibilityState={{ selected: passwordVisible }}
+            hitSlop={8}
+            style={styles.passwordVisibilityButton}
+          >
+            <Svg width={21} height={21} viewBox="0 0 24 24" fill="none">
+              {passwordVisible ? (
+                <>
+                  <Path
+                    d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"
+                    stroke={C.muted}
+                    strokeWidth={1.8}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <Circle
+                    cx={12}
+                    cy={12}
+                    r={3}
+                    stroke={C.muted}
+                    strokeWidth={1.8}
+                  />
+                </>
+              ) : (
+                <>
+                  <Path
+                    d="m3 3 18 18M10.6 10.6a2 2 0 0 0 2.8 2.8"
+                    stroke={C.muted}
+                    strokeWidth={1.8}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <Path
+                    d="M9.9 5.2A10.7 10.7 0 0 1 12 5c6.4 0 10 7 10 7a14.8 14.8 0 0 1-3.2 4.1M6.2 6.2C3.5 8 2 12 2 12s3.6 7 10 7c1.2 0 2.3-.2 3.3-.6"
+                    stroke={C.muted}
+                    strokeWidth={1.8}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </>
+              )}
+            </Svg>
+          </Pressable>
+        ) : null}
         {rightAction}
       </View>
       {error ? (

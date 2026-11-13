@@ -19,17 +19,23 @@ import {
   getNotificationAppearance,
   getNotificationTarget,
 } from "../lib/notifications";
+import {
+  markAllGuardianNotificationsRead,
+  markGuardianNotificationRead,
+} from "../services/guardian-actions";
 import { styles } from "./NotificationsScreen.styles";
 
 export function NotificationsScreen() {
   const {
     notifications,
-    setNotifications,
     children,
     navigate,
     setSelectedChildId,
+    refreshData,
+    showToast,
   } = useApp();
   const [filter, setFilter] = useState<NotificationFilter>("All");
+  const [updating, setUpdating] = useState(false);
   const unread = notifications.filter((item) => !item.read).length;
   const visible = useMemo(
     () =>
@@ -53,14 +59,45 @@ export function NotificationsScreen() {
       right={
         unread > 0 ? (
           <Pressable
-            onPress={() =>
-              setNotifications((prev) =>
-                prev.map((item) => ({ ...item, read: true })),
-              )
-            }
+            disabled={updating}
+            onPress={async () => {
+              setUpdating(true);
+              let markedRead = false;
+              try {
+                await markAllGuardianNotificationsRead();
+                markedRead = true;
+              } catch (error) {
+                console.error("Unable to mark all notifications as read.", error);
+                showToast({
+                  title: "Notifications not updated",
+                  message:
+                    error instanceof Error
+                      ? error.message
+                      : "Unable to update notifications.",
+                  tone: "error",
+                });
+                setUpdating(false);
+                return;
+              }
+              try {
+                await refreshData();
+              } catch (error) {
+                console.error("Unable to refresh notifications after marking them read.", error);
+                showToast({
+                  title: markedRead ? "Notifications marked read" : "Notifications not updated",
+                  message:
+                    error instanceof Error
+                      ? error.message
+                      : "The latest notification status could not be loaded.",
+                  tone: "info",
+                });
+              } finally {
+                setUpdating(false);
+              }
+            }}
           >
             <AppText size={10} color="#FFFFFF" weight="semibold">
-              Mark all read
+              {updating ? "Updating…" : "Mark all read"}
             </AppText>
           </Pressable>
         ) : undefined
@@ -79,12 +116,12 @@ export function NotificationsScreen() {
       {unread > 0 ? (
         <InfoBanner
           title={`${unread} unread notifications`}
-          message="Tap a notification to mark it as read. Requests and school updates appear here."
+          message="Tap a notification to mark it as read."
         />
       ) : null}
       <SectionTitle
         title="Recent activity"
-        subtitle="Local demo notifications"
+        subtitle="Updates for your account"
       />
       {visible.map((item) => {
         const { backgroundColor, color, icon } = getNotificationAppearance(
@@ -95,10 +132,40 @@ export function NotificationsScreen() {
           <Card
             key={item.id}
             padding={12}
-            onPress={() => {
-              setNotifications((prev) =>
-                prev.map((n) => (n.id === item.id ? { ...n, read: true } : n)),
-              );
+            onPress={async () => {
+              if (!item.read) {
+                try {
+                  await markGuardianNotificationRead(item.id);
+                } catch (error) {
+                  console.error("Unable to mark notification as read.", error);
+                  showToast({
+                    title: "Notification not updated",
+                    message:
+                      error instanceof Error
+                        ? error.message
+                        : "Unable to update this notification.",
+                    tone: "error",
+                  });
+                  if (item.childId && child) {
+                    setSelectedChildId(child.id);
+                    navigate(getNotificationTarget(item.title));
+                  }
+                  return;
+                }
+                try {
+                  await refreshData();
+                } catch (error) {
+                  console.error("Unable to refresh after marking a notification as read.", error);
+                  showToast({
+                    title: "Notification marked read",
+                    message:
+                      error instanceof Error
+                        ? error.message
+                        : "The latest notification status could not be loaded.",
+                    tone: "info",
+                  });
+                }
+              }
               if (item.childId && child) {
                 setSelectedChildId(child.id);
                 navigate(getNotificationTarget(item.title));
@@ -164,9 +231,6 @@ export function NotificationsScreen() {
           </AppText>
         </Card>
       ) : null}
-      <AppText size={10} color={C.muted} align="center">
-        Notifications in this build are sample data kept in memory.
-      </AppText>
     </Page>
   );
 }

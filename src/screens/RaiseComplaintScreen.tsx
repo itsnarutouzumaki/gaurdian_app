@@ -1,11 +1,5 @@
 import React, { useState } from "react";
 import { Pressable, View } from "react-native";
-import {
-  errorCodes,
-  isErrorWithCode,
-  pick,
-  types,
-} from "@react-native-documents/picker";
 import { useApp, useAppAlert } from "../app-context";
 import {
   ActionButton,
@@ -23,6 +17,7 @@ import { ChoiceModal } from "../components/Selectors";
 import { getAcademicYear, getChild } from "../lib/selectors";
 import { dateLabel } from "../lib/format";
 import { C } from "../theme";
+import { createGuardianComplaint } from "../services/guardian-actions";
 import { styles } from "./RaiseComplaintScreen.styles";
 
 export function RaiseComplaintScreen() {
@@ -34,9 +29,8 @@ export function RaiseComplaintScreen() {
     setSelectedChildId,
     navigate,
     goBack,
-    setComplaints,
     complaints,
-    setNotifications,
+    refreshData,
     showToast,
   } = useApp();
   const selectedChild = getChild(children, selectedChildId);
@@ -44,37 +38,8 @@ export function RaiseComplaintScreen() {
   const [childPicker, setChildPicker] = useState(false);
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
-  const [attachment, setAttachment] = useState<{
-    name: string;
-    uri?: string;
-  } | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const subjects = year.subjects.map((s) => s.name);
-  const pickAttachment = async () => {
-    try {
-      const [result] = await pick({
-        type: [types.pdf, types.images],
-        allowMultiSelection: false,
-      });
-      if (!result) return;
-      setAttachment({
-        name: result.name || result.uri.split("/").pop() || "Attachment",
-        uri: result.uri,
-      });
-    } catch (error) {
-      if (
-        isErrorWithCode(error) &&
-        error.code === errorCodes.OPERATION_CANCELED
-      ) {
-        return;
-      }
-      console.error("Unable to open the native attachment picker.", error);
-      Alert.alert(
-        "Attachment picker",
-        "The document picker could not be opened. You can still submit the complaint without an attachment.",
-      );
-    }
-  };
   return (
     <Page
       title="Raise Complaint"
@@ -83,7 +48,7 @@ export function RaiseComplaintScreen() {
     >
       <InfoBanner
         title="We are here to help"
-        message="Include a clear description. Attachment is optional and can be a PDF or image."
+        message="Include a clear description. Submitted complaints are stored with the selected child's school records."
       />
       <Card padding={15}>
         <SelectField
@@ -126,34 +91,16 @@ export function RaiseComplaintScreen() {
             {message.length}/1000
           </AppText>
         </View>
-        <AppText size={12} weight="semibold" style={styles.attachLabel}>
-          Attachment (optional)
-        </AppText>
-        <Pressable onPress={pickAttachment} style={styles.attachment}>
-          <AppText size={24} color={C.primary}>
-            ⇧
-          </AppText>
-          <AppText size={12} weight="semibold" style={styles.attachTitle}>
-            {attachment ? attachment.name : "Tap to upload a file"}
-          </AppText>
-          <AppText size={10} color={C.muted} style={styles.attachHint}>
-            {attachment
-              ? "Tap to replace the selected file"
-              : "PDF, JPG or PNG · Optional"}
-          </AppText>
-        </Pressable>
-        {attachment ? (
-          <ActionButton
-            title="Remove attachment"
-            variant="plain"
-            onPress={() => setAttachment(null)}
-            style={styles.removeAttachment}
-          />
-        ) : null}
+        <InfoBanner
+          title="Attachments are unavailable"
+          message="File attachments are not available right now."
+          tone="orange"
+        />
         <ActionButton
           title="Submit complaint"
           loading={submitting}
-          onPress={() => {
+          disabled={submitting}
+          onPress={async () => {
             if (!message.trim())
               return Alert.alert(
                 "Message required",
@@ -165,46 +112,56 @@ export function RaiseComplaintScreen() {
                 "Please provide at least 8 characters so the school can understand the issue.",
               );
             setSubmitting(true);
-            const item = {
-              id: `cmp-${Date.now()}`,
-              childId: selectedChild.id,
-              subject: subject || "General",
-              message: message.trim(),
-              attachmentName: attachment?.name || null,
-              status: "Submitted",
-              createdAt: new Date().toISOString().slice(0, 10),
-            };
-            setComplaints([item, ...complaints]);
-            setNotifications((prev) => [
-              {
-                id: `n-${Date.now()}`,
-                type: "complaint",
-                title: "Complaint submitted",
-                message: `Your ${item.subject.toLowerCase()} complaint for ${selectedChild.fullName} was submitted.`,
-                dateLabel: "Just now",
-                read: false,
+            try {
+              await createGuardianComplaint({
                 childId: selectedChild.id,
-              },
-              ...prev,
-            ]);
-            setSubmitting(false);
+                subject: subject || "General",
+                message: message.trim(),
+              });
+            } catch (error) {
+              console.error("Complaint submission failed.", error);
+              showToast({
+                title: "Complaint not submitted",
+                message:
+                  error instanceof Error
+                    ? error.message
+                    : "Unable to submit the complaint.",
+                tone: "error",
+              });
+              setSubmitting(false);
+              return;
+            }
+            setMessage("");
+            setSubject("");
             showToast({
               title: "Complaint submitted",
-              message:
-                "Your complaint has been added to the demo records and a notification has been created.",
+              message: "Your complaint was sent to the school.",
               tone: "success",
               action: {
                 label: "View notifications",
                 onPress: () => navigate("Notifications"),
               },
             });
+            try {
+              await refreshData();
+            } catch (error) {
+              console.error("Unable to refresh data after a complaint.", error);
+              showToast({
+                title: "Complaint submitted",
+                message:
+                  "The school received your complaint. Check again later for an update.",
+                tone: "info",
+              });
+            } finally {
+              setSubmitting(false);
+            }
           }}
           style={styles.submit}
         />
       </Card>
       <SectionTitle
         title="Recent complaints"
-        subtitle="Demo records linked to this account"
+        subtitle="Complaints associated with this account"
       />
       {complaints
         .filter((item) => item.childId === selectedChild.id)

@@ -12,6 +12,7 @@ export const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
+  historyStudent: { flexDirection: "row", columnGap: 4, marginTop: 5 },
   historyReason: { marginTop: 5 },
   dateField: {
     borderWidth: 1,

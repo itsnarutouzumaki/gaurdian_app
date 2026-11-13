@@ -1,24 +1,23 @@
 import React from "react";
 import { View } from "react-native";
 import { useApp } from "../app-context";
+import { getSchoolConfiguration } from "../config/schoolConfig";
 import { AppText, Card, Divider, InfoBanner, Page } from "../components/UI";
 import { C } from "../theme";
-import mock from "../data/mock-data.json";
-import type { PolicySection } from "../types";
 import { styles } from "./PrivacyPolicyScreen.styles";
 
 export function PrivacyPolicyScreen() {
-  const { goBack, school } = useApp();
-  const sections: PolicySection[] = mock.privacySections;
+  const { goBack, school, language } = useApp();
+  const sections = getSchoolConfiguration().guardianContent.privacySections[language];
   return (
     <Page
       title="Privacy Policy"
-      subtitle="Demo policy · Last updated 24 October 2026"
+      subtitle="How your information is handled"
       onBack={goBack}
     >
       <InfoBanner
         title="Protecting student information matters"
-        message="Student records are sensitive. This sample policy does not replace a school-approved privacy and security review."
+        message="Student information is available only to accounts authorized by the school."
         tone="blue"
       />
       <Card padding={15}>

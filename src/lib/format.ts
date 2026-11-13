@@ -21,8 +21,8 @@ export const dateLabel = (raw: string) => {
     year: "numeric",
   });
 };
-export const isProfileComplete = (profile: { fullName: string; mobileNumber: string; email: string; profilePhotoUrl: string | null }) =>
-  Boolean(profile.fullName.trim() && profile.mobileNumber.trim() && profile.email.trim() && profile.profilePhotoUrl);
+export const isProfileComplete = (profile: { fullName: string }) =>
+  Boolean(profile.fullName.trim());
 export const initials = (value: string) => value.split(' ').filter(Boolean).slice(0, 2).map(x => x[0]?.toUpperCase()).join('') || 'GS';
 export const scoreLabel = (score: number, maxScore: number) => {
   const format = new Intl.NumberFormat(currentLocale());

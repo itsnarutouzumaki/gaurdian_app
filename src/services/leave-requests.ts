@@ -1,4 +1,4 @@
-import type { LeaveRequestRecord } from "../types";
+import { authenticatedRequest } from "./api/authenticated-request";
 
 export type LeaveRequestSubmission = {
   childId: string;
@@ -9,7 +9,17 @@ export type LeaveRequestSubmission = {
 };
 
 export async function submitLeaveRequest(
-  _submission: LeaveRequestSubmission,
-): Promise<LeaveRequestRecord> {
-  throw new Error("Leave request service is not configured.");
+  submission: LeaveRequestSubmission,
+): Promise<void> {
+  await authenticatedRequest("/guardian/leave-requests", {
+    method: "POST",
+    body: {
+      childId: submission.childId,
+      startsOn: submission.startDate,
+      endsOn: submission.endDate,
+      reason: submission.reason,
+      password: submission.password,
+      fileIds: [],
+    },
+  });
 }

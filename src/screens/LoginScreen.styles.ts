@@ -14,13 +14,6 @@ export const styles = StyleSheet.create({
   title: { marginTop: 14 },
   subtitle: { marginTop: 5 },
   forgotButton: { alignSelf: "flex-end", marginTop: -3, marginBottom: 16 },
-  dividerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginVertical: 15,
-    gap: 12,
-  },
-  dividerLine: { flex: 1, height: 1, backgroundColor: C.border },
   signupRow: {
     flexDirection: "row",
     justifyContent: "center",
@@ -28,11 +21,4 @@ export const styles = StyleSheet.create({
     gap: 5,
     marginTop: 7,
   },
-  demoBanner: {
-    marginTop: 3,
-    padding: 12,
-    borderRadius: 12,
-    backgroundColor: C.blueSoft,
-  },
-  demoCopy: { marginTop: 3 },
 });

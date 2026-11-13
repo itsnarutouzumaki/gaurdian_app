@@ -20,34 +20,13 @@ export function HomeScreen() {
   const {
     school,
     media,
-    guardian,
     children,
     navigate,
     setSelectedChildId,
     setSelectedYear,
-    showToast,
     linkRequests,
   } = useApp();
-  const onAddChild = () => {
-    const missing: string[] = [];
-    if (!guardian.fullName.trim()) missing.push("Full name");
-    if (!guardian.mobileNumber.trim()) missing.push("Mobile number");
-    if (!guardian.email.trim()) missing.push("Email address");
-    if (!guardian.profilePhotoUrl) missing.push("Profile photo");
-    if (missing.length) {
-      showToast({
-        title: "Please complete your profile first",
-        message: `Missing: ${missing.join(", ")}.`,
-        tone: "error",
-      });
-      navigate("EditProfile", {
-        notice: "Complete the required profile fields before linking a child.",
-        missingFields: missing,
-      });
-      return;
-    }
-    navigate("AddChild");
-  };
+  const onAddChild = () => navigate("AddChild");
   return (
     <Page title={school.name} subtitle="Your family’s school companion" scroll>
       <SchoolPhotoCarousel
@@ -111,7 +90,7 @@ export function HomeScreen() {
                   {year.className} · Section {year.section}
                 </AppText>
                 <AppText size={10} color={C.muted} style={styles.childId}>
-                  Student ID: {child.studentId}
+                  Student number: {child.studentId}
                 </AppText>
               </View>
               <AppText size={24} color={C.muted}>
@@ -129,6 +108,13 @@ export function HomeScreen() {
           </Card>
         );
       })}
+      {children.length === 0 ? (
+        <InfoBanner
+          title="No linked children yet"
+          message="Children appear here after the school approves a link request."
+          tone="orange"
+        />
+      ) : null}
       {linkRequests
         .filter((item) => item.status === "Pending")
         .map((req) => (
@@ -140,7 +126,7 @@ export function HomeScreen() {
               <View style={styles.flex}>
                 <AppText weight="semibold">Access request pending</AppText>
                 <AppText size={11} color={C.muted}>
-                  {req.studentName} · {req.studentId}
+                  Student number: {req.studentNumber}
                 </AppText>
               </View>
               <Badge label="Pending" tone="orange" />

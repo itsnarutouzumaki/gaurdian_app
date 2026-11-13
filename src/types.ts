@@ -1,4 +1,3 @@
-import type mock from "./data/mock-data.json";
 import type {
   SchoolInformation,
   SchoolMediaConfig as SchoolMediaConfiguration,
@@ -38,13 +37,12 @@ export type LeaveRequestRecord = {
 };
 export type LinkRequestRecord = {
   id: string;
-  studentId: string;
-  studentName: string;
+  studentNumber: string;
   status: string;
   createdAt: string;
 };
-export type HelpTopic = (typeof mock.helpTopics)[number];
-export type PolicySection = (typeof mock.termsSections)[number];
+export type HelpTopic = { id: string; title: string; body: string };
+export type PolicySection = { title: string; body: string };
 export type GuardianProfile = {
   id: string;
   fullName: string;
@@ -55,11 +53,95 @@ export type GuardianProfile = {
   relationship: string;
   profileComplete?: boolean;
 };
-export type ChildRecord = (typeof mock.children)[number];
-export type AcademicYearRecord = ChildRecord["academicYears"][number];
-export type SubjectRecord = AcademicYearRecord["subjects"][number];
-export type TestRecord = SubjectRecord["tests"][number];
-export type FeeReceiptRecord = AcademicYearRecord["feeReceipts"][number];
+export type AttendanceRecord = {
+  day: number;
+  date: string;
+  status: AttendanceStatus;
+};
+export type AttendanceMonthRecord = {
+  month: string;
+  monthNumber: number;
+  year: number;
+  records: AttendanceRecord[];
+};
+export type SubjectTestRecord = {
+  id: string;
+  name: string;
+  date: string;
+  score: number;
+  maxScore: number;
+  teacherId: string;
+  teacherRemarks: string;
+};
+export type StudentSubjectRecord = {
+  id: string;
+  name: string;
+  teacherId: string;
+  icon: string;
+  color: string;
+  tests: SubjectTestRecord[];
+};
+export type FeeReceiptRecord = {
+  id: string;
+  label: string;
+  academicYear: string;
+  breakdown: Record<string, number>;
+  total: number;
+  paid: boolean;
+  paymentDate: string;
+  paymentMode: string;
+  transactionId: string;
+};
+export type AcademicYearRecord = {
+  label: string;
+  startYear: number;
+  className: string;
+  section: string;
+  attendance: {
+    totalClasses: number;
+    present: number;
+    absent: number;
+    holidays: number;
+    percentage: number;
+    months: AttendanceMonthRecord[];
+  };
+  subjects: StudentSubjectRecord[];
+  feeReceipts: FeeReceiptRecord[];
+  classTeacherId: string;
+};
+export type ChildRecord = {
+  id: string;
+  fullName: string;
+  photoUrl: string;
+  studentId: string;
+  className: string;
+  section: string;
+  rollNumber?: number;
+  relationship: string;
+  gender: string;
+  dateOfBirth: string;
+  bloodGroup: string;
+  admissionNumber: string;
+  currentAcademicYear: string;
+  academicYears: AcademicYearRecord[];
+};
+export type SubjectRecord = StudentSubjectRecord;
+export type TestRecord = SubjectTestRecord;
+export type ExaminationType = "halfYearly" | "yearly" | "preboard";
+export type ExaminationSubjectResult = {
+  subjectId: string;
+  score: number;
+  maxScore: number;
+};
+export type ExaminationRecord = {
+  id: string;
+  childId: string;
+  academicYear: string;
+  type: ExaminationType;
+  title: string;
+  date: string;
+  subjects: ExaminationSubjectResult[];
+};
 export type Notice = { id: string; type: string; title: string; message: string; dateLabel: string; read: boolean; childId?: string };
 export type ToastMessage = {
   title: string;

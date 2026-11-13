@@ -10,7 +10,6 @@ import {
 } from "../components/UI";
 import { getAcademicYear, getChild, getTeacher } from "../lib/selectors";
 import { dateLabel, scoreLabel } from "../lib/format";
-import { shareDemoPdf } from "../lib/pdf";
 import { C } from "../theme";
 import { styles } from "./SubjectResultsScreen.styles";
 
@@ -24,7 +23,6 @@ export function SubjectResultsScreen() {
     navigate,
     goBack,
     teachers,
-    showToast,
   } = useApp();
   const child = getChild(children, selectedChildId);
   const year = getAcademicYear(child, selectedYear);
@@ -71,7 +69,7 @@ export function SubjectResultsScreen() {
       </Card>
       <InfoBanner
         title="Scanned answer copies"
-        message="Tap the download icon to create a sample PDF and open the phone share sheet. The PDF does not render inside this app. In production, this will use the school-uploaded scan."
+        message="Scanned answer copies aren't available right now."
       />
       {subject.tests
         .slice()
@@ -101,45 +99,7 @@ export function SubjectResultsScreen() {
                   Marks
                 </AppText>
               </View>
-              <Pressable
-                disabled={!test.copyAvailable}
-                onPress={() =>
-                  shareDemoPdf(
-                    `${child.fullName}-${subject.name}-${test.name}`,
-                    [
-                      `Student: ${child.fullName}`,
-                      `Class: ${year.className} · Section ${year.section}`,
-                      `Subject: ${subject.name}`,
-                      `Assessment: ${test.name}`,
-                      `Date: ${dateLabel(test.date)}`,
-                      "",
-                      "SAMPLE SCANNED ANSWER COPY",
-                      "This locally generated PDF is a placeholder for the original scanned copy uploaded by the school.",
-                      "It intentionally does not include any question-wise marks in the app interface.",
-                      "",
-                      "Replace this mock document with the approved school document when backend storage is connected.",
-                    ],
-                    showToast,
-                  )
-                }
-                style={[
-                  styles.download,
-                  test.copyAvailable ? styles.downloadOn : styles.downloadOff,
-                ]}
-              >
-                <AppText
-                  size={20}
-                  color={test.copyAvailable ? C.primary : "#A6AFBC"}
-                >
-                  ⇩
-                </AppText>
-              </Pressable>
             </View>
-            {!test.copyAvailable ? (
-              <AppText size={10} color={C.muted} style={styles.copyNote}>
-                Scanned copy not uploaded by school yet.
-              </AppText>
-            ) : null}
           </Card>
         ))}
     </Page>

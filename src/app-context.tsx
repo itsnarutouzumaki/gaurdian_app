@@ -1,10 +1,12 @@
 import React, { createContext, useContext } from "react";
 import { Alert } from "react-native";
 import type { Language } from "./lib/i18n";
+import type { GuardianAppData } from "./services/guardian-data/guardian-bootstrap.types";
 import type {
   ChildRecord,
   ComplaintRecord,
   GuardianProfile,
+  ExaminationRecord,
   LeaveRequestRecord,
   LinkRequestRecord,
   Notice,
@@ -22,14 +24,11 @@ export type AppContextValue = {
   guardian: GuardianProfile;
   setGuardian: React.Dispatch<React.SetStateAction<GuardianProfile>>;
   children: ChildRecord[];
+  examinations: ExaminationRecord[];
   notifications: Notice[];
-  setNotifications: React.Dispatch<React.SetStateAction<Notice[]>>;
   complaints: ComplaintRecord[];
-  setComplaints: React.Dispatch<React.SetStateAction<ComplaintRecord[]>>;
   leaveRequests: LeaveRequestRecord[];
-  setLeaveRequests: React.Dispatch<React.SetStateAction<LeaveRequestRecord[]>>;
   linkRequests: LinkRequestRecord[];
-  setLinkRequests: React.Dispatch<React.SetStateAction<LinkRequestRecord[]>>;
   teachers: TeacherRecord[];
   selectedChildId: string;
   setSelectedChildId: (id: string) => void;
@@ -49,7 +48,8 @@ export type AppContextValue = {
   setToast: (toast: ToastMessage | null) => void;
   logoutDialogVisible: boolean;
   setLogoutDialogVisible: (visible: boolean) => void;
-  signIn: () => void;
+  signIn: (data: GuardianAppData) => void;
+  refreshData: () => Promise<void>;
   language: Language;
   setLanguage: (language: Language) => Promise<void>;
   alert: (...args: Parameters<typeof Alert.alert>) => void;

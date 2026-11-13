@@ -4,7 +4,6 @@ import { useApp } from "../app-context";
 import { AppText, Card, InfoBanner, Page } from "../components/UI";
 import { Chip } from "../components/UI";
 import { TeacherListRow } from "../components/TeacherListRow";
-import { TEACHER_DIRECTORY_FILTERS } from "../data/screen-options";
 import { C } from "../theme";
 import { styles } from "./TeachersDirectoryScreen.styles";
 
@@ -12,6 +11,10 @@ export function TeachersDirectoryScreen() {
   const { teachers, goBack, setSelectedTeacherId, navigate } = useApp();
   const [query, setQuery] = useState("");
   const [subject, setSubject] = useState("All");
+  const filters = [
+    "All",
+    ...new Set(teachers.flatMap((teacher) => teacher.subjects)),
+  ];
   const visible = teachers.filter(
     (teacher) =>
       teacher.isActive !== false &&
@@ -42,7 +45,7 @@ export function TeachersDirectoryScreen() {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.tabsContent}
       >
-        {TEACHER_DIRECTORY_FILTERS.map((item) => (
+        {filters.map((item) => (
           <Chip
             key={item}
             label={item}

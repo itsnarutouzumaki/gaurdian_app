@@ -1,21 +1,14 @@
 # Guardian School App — architecture and refactoring rules
 
-These instructions apply to **all** source changes in this repository. They exist so maintainability work does not silently redesign the product or change demo behavior.
+These instructions apply to **all** source changes in this repository. Preserve product behavior and keep operational records backend-backed.
 
-This is a frontend-only Expo / React Native / TypeScript prototype. Login, complaints, leave, profile edits, and notifications are in-memory session state. PDF actions generate placeholder files and open the system share sheet.
+This is a React Native CLI / TypeScript app configured for the Test International School test tenant. Authentication and operational records come from the backend; do not bundle people or school-transaction fixtures in the app.
 
 ## Stack freeze
 
-Do **not** change versions of Expo, React Native, React, TypeScript, or other packages unless the user explicitly asks.
+Do **not** change versions of React Native, React, TypeScript, or other packages unless the user explicitly asks.
 
-Pinned at the time of the architecture audit (see `package.json`):
-
-- `expo` ~58.0.19
-- `react` 19.3.0
-- `react-native` 0.88.0
-- `react-native-safe-area-context` ~5.10.1
-- Expo modules: `expo-document-picker`, `expo-file-system`, `expo-image-picker`, `expo-sharing` (SDK 58)
-- TypeScript ~6.0.3, `babel-preset-expo` ~58.0.20
+The app uses React Native CLI. Do not introduce Expo or Expo modules. Treat `package.json` and the lockfile as the version source of truth.
 
 Do not add navigation libraries, UI kits, state libraries, or other dependencies for a maintainability refactor. The app uses a custom in-memory stack in `App.tsx` (`navigate` / `replace` / `goBack` / `resetTo`). Preserve that model.
 
@@ -58,7 +51,8 @@ Every source file must have **one clear primary responsibility**.
 ### Lib, data, and types
 
 - `src/lib/` is for pure helpers already present: `format.ts`, `selectors.ts`, `calendar.ts`, `notifications.ts`, `pdf.ts`. Reuse them instead of duplicating (Attendance currently rebuilds a calendar grid instead of calling `createCalendarGrid`; `monthTitle` exists in `format.ts`).
-- `src/data/mock-data.json` is the source of guardian/student operational demo content. School-wide identity, theme, academic defaults, media and localization live in `../shared/school-config.json`, accessed through `src/config/schoolConfig.ts`. App-specific native settings remain under `src/data/schools/<school-id>/`; teacher records there are demo operational data, not shared school configuration.
+- Guardian, student, teacher, attendance, fee, assessment, request, and notification records come from the authenticated backend bootstrap. Do not add bundled operational fixtures or success-shaped local fallbacks. School identity, tenant/API configuration, academic defaults, media, and localized guardian content live in `../shared/school-config.json`.
+- App-specific native settings and document templates remain under `src/data/schools/<school-id>/`; keep them build-time configuration rather than user or operational records.
 - `src/data/screen-options.ts` holds static screen option lists (filters, tabs, profile menu). Keep that role.
 - `src/types.ts` is the domain type source. Prefer tightening `any` with real types over introducing new wrapper types.
 - `src/app-context.tsx` only defines `AppContextValue`, the provider, and `useApp`. App state construction stays in `App.tsx`.
@@ -88,15 +82,15 @@ Must keep, unless the user asks otherwise:
 
 - All 23 `ScreenName` routes and the `App.tsx` renderer `switch`.
 - Stack + tab rules: tabs hidden on Splash/Login/SignUp/ForgotPassword; Home / Notifications / Profile `resetTo` targets (`Home`, `Notifications`, `MyProfile`).
-- Profile-completeness gate before Add Child (full name, mobile, email, photo); mobile/email read-only on Edit Profile.
-- Student ID format check, duplicate-link rejection, pending link requests (not immediate linking).
+- Profile name and optional address update through the guardian API; mobile/email are read-only.
+- Student-number requests use the school API, which normalizes valid numbers and creates pending requests.
 - Academic-year ribbon shared across attendance, results, fees; child switch resets year to that child’s current year.
 - Attendance statuses and legend (present / absent / holiday / no-class / unmarked); holidays not counted as absences.
 - Subject overview without marks; tests newest-first with download only when `copyAvailable`.
-- Complaint message required; leave date range validation; demo toasts and `Alert` copy.
-- Notification filters All / Requests / Updates and mark-read behavior.
-- JSON-driven school branding and `scripts/apply-school-config.js` as the way to sync `app.json`.
-- Demo login: any non-empty mobile + password calls `signIn()`.
+- Complaint message and leave date validation; errors must be explicit and success must follow a successful server response.
+- Notification filters All / Requests / Updates and backend-backed mark-read behavior.
+- Shared school/tenant/API configuration and `scripts/apply-school-config.js` for build-time app identity.
+- Login, signup verification, and password recovery use backend services; never bypass authentication with demo login.
 
 Do not redesign screens, copy, icons, or layout while splitting files or moving styles.
 
@@ -122,12 +116,13 @@ which is:
 1. `npm run data:check` — `scripts/check-data.js`
 2. `npm run route:check` — `scripts/check-routes.js` (requires every `ScreenName` to have a `case` in `App.tsx`)
 3. `npm run syntax:check` — `scripts/check-source-syntax.js`
-4. `npm run logic:check` — `scripts/check-logic.js` (profile completeness, leave dates, calendar grid, INR format, historical Maths teacher ids)
-5. `npm run typecheck` — `tsc --noEmit`
+4. `npm run logic:check` — `scripts/check-logic.js` (API mapping, document rendering, leave dates, calendar grid, formatting)
+5. `npm run locale:check` — `scripts/check-localization.js`
+6. `npm run typecheck` — `tsc --noEmit`
 
 If `verify` stops at the first failure, run the remaining scripts individually and record each result.
 
-Do not “fix” check failures by changing demo data or `app.json` unless that is the assigned task. Do not run `config:apply` as a drive-by during a UI-structure refactor.
+Do not “fix” check failures by changing shared school configuration or native app identity unless that is within the assigned task. Do not run `config:apply` as a drive-by during a UI-structure refactor.
 
 `check-routes.js` reads `App.tsx` with regex. After splitting screens, keep the `case "ScreenName":` map in `App.tsx` and keep literal `navigate("…")` / `replace` / `resetTo` string destinations.
 
@@ -135,7 +130,7 @@ Do not “fix” check failures by changing demo data or `app.json` unless that 
 
 Composition:
 
-- `App.tsx` — operational mock state, active school registry values, stack, auth flag, context value, tabs, toast, logout modal, screen switch.
+- `App.tsx` — backend-derived operational state, active school configuration, stack, auth flag, context value, tabs, toast, logout modal, screen switch.
 - `App.styles.ts` — static app-shell, toast and logout-dialog styles.
 - `src/app-context.tsx` — context type + `useApp`.
 - `src/theme.ts`, `src/types.ts`.
@@ -153,7 +148,7 @@ Each `ScreenName` route is rendered by a corresponding component in `src/screens
 
 Components: `src/components/UI.tsx` (+ `UI.styles.ts`), `Selectors.tsx` (+ `Selectors.styles.ts`), `DatePickerModal.tsx` (+ `DatePickerModal.styles.ts`), and `TeacherListRow.tsx` (+ `TeacherListRow.styles.ts`).
 
-Scripts: `check-data.js`, `check-routes.js`, `check-source-syntax.js`, `check-inline-styles.js`, `check-logic.js`, `apply-school-config.js`, `generate-mock-data.py`.
+Scripts: `check-data.js`, `check-routes.js`, `check-source-syntax.js`, `check-inline-styles.js`, `check-logic.js`, `check-localization.js`, `apply-school-config.js`.
 
 Product docs: `README.md`, `MANUAL_TEST_PLAN.md`. Treat the manual test plan as the interaction contract when judging whether a refactor changed behavior.
 
@@ -161,10 +156,10 @@ Product docs: `README.md`, `MANUAL_TEST_PLAN.md`. Treat the manual test plan as 
 
 Recorded during the architecture audit. Later phases must not hide these by skipping checks.
 
-- The school-configuration migration keeps school branding in `src/data/schools/`; `mock-data.json` contains operational demo data only, with canonical teachers in the active school’s `teachers.json`.
-- The owner-provided school logo at `../shared/assets/logo.png` is shared by both apps. UI components and committed native launcher assets use that same source. Do not substitute another image.
-- Only `greenwood-demo` is currently registered. Do not create additional school records or theme variants without supplied data; the dark palette remains unavailable until real colors are provided.
-- The logo asset currently shown for this demo is the temporary MNNIT logo requested by the user. A Greenwood-owned logo has not been supplied.
+- The shared school configuration supplies school branding and tenant/API values. Operational teacher profiles are returned by the guardian API and scoped to linked students.
+- School-owned source assets and school/app configuration live only in `../shared/`. Native Android/iOS resource copies are generated from those shared assets by `npm run config:apply`; do not edit the generated copies directly.
+- Only `test-international` is currently registered. Do not create additional school records or theme variants without supplied data; the dark palette remains unavailable until real colors are provided.
+- The current logo asset is a temporary placeholder, not an official Test International School logo.
 
 ## Refactor status
 
@@ -174,7 +169,7 @@ The screen isolation and shared-style/type-safety phases are complete. Preserve 
 - Keep navigation, the literal route switch, app state, and screen business rules in their existing owners.
 - Keep shared static styles in colocated `*.styles.ts` files and use existing `C`, `R`, and `S` theme tokens where appropriate.
 - `npm run style:check` detects fully static object literals directly assigned to JSX `style` props; dynamic styles and style arrays remain permitted.
-- JSON-derived record types are based on the current mock data shape. Update types only alongside an explicitly authorized data-schema change.
+- API response and domain record types are maintained alongside the guardian bootstrap mapper. Update them when the backend contract changes; do not infer missing data with hardcoded sample values.
 - `npm run verify` includes data, route, syntax, style, logic, and type checks. Run checks individually as well when the known `data:check` failure stops the sequence.
 
-Stop if a change would alter navigation, validation, copy, layout, or demo data. Ask the user before any product-facing change.
+Preserve existing behavior unless the task requires a product change. Ask the user when requirements or data ownership are materially ambiguous.

@@ -33,8 +33,7 @@ export function LeaveRequestScreen() {
     navigate,
     goBack,
     leaveRequests,
-    setLeaveRequests,
-    setNotifications,
+    refreshData,
     showToast,
   } = useApp();
   const selectedChild = getChild(children, selectedChildId);
@@ -60,7 +59,7 @@ export function LeaveRequestScreen() {
     >
       <InfoBanner
         title="Request approval from school"
-        message="Your request will be sent to the principal. Submitting a request does not automatically mark attendance as excused."
+        message="The school will review your request. Attendance changes only after approval."
       />
       <Card padding={15}>
         <SelectField
@@ -152,6 +151,14 @@ export function LeaveRequestScreen() {
                 tone={item.status === "Approved" ? "green" : "orange"}
               />
             </View>
+            <View style={styles.historyStudent}>
+              <AppText size={11} color={C.muted}>
+                Student name:
+              </AppText>
+              <AppText size={11} color={C.muted}>
+                {selectedChild.fullName}
+              </AppText>
+            </View>
             <AppText size={11} color={C.muted} style={styles.historyReason}>
               {item.reason || "No reason provided"}
             </AppText>
@@ -208,8 +215,7 @@ export function LeaveRequestScreen() {
         />
         <InfoBanner
           title="Password handling"
-          message="Your password is held in memory for the submission payload only. This service is not connected to a backend and does not verify or submit requests yet."
-          tone="orange"
+          message="Your password confirms this request and is not saved."
         />
         <ActionButton
           title="Confirm and submit"
@@ -233,20 +239,10 @@ export function LeaveRequestScreen() {
             };
             setSubmitting(true);
             try {
-              const request = await submitLeaveRequest(submission);
-              setLeaveRequests((previous) => [request, ...previous]);
-              setNotifications((previous) => [
-                {
-                  id: `n-${Date.now()}`,
-                  type: "request",
-                  title: "Leave request submitted",
-                  message: `Your leave request for ${selectedChild.fullName} (${dateLabel(startDate)} – ${dateLabel(endDate)}) is waiting for principal review.`,
-                  dateLabel: "Just now",
-                  read: false,
-                  childId: selectedChild.id,
-                },
-                ...previous,
-              ]);
+              await submitLeaveRequest(submission);
+              setStartDate("");
+              setEndDate("");
+              setReason("");
               showToast({
                 title: "Leave request sent",
                 message:
@@ -257,6 +253,17 @@ export function LeaveRequestScreen() {
                   onPress: () => navigate("Notifications"),
                 },
               });
+              try {
+                await refreshData();
+              } catch (error) {
+                console.error("Unable to refresh data after a leave request.", error);
+                showToast({
+                  title: "Request submitted",
+                  message:
+                    "The school received your request. Check again later for an update.",
+                  tone: "info",
+                });
+              }
             } catch (error) {
               console.error("Leave request submission failed.", error);
               showToast({

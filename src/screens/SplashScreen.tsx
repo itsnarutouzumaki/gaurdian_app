@@ -17,12 +17,14 @@ export function SplashScreen() {
     <Page scroll={false} contentStyle={styles.pageContent}>
       <View style={styles.root}>
         <View style={styles.hero}>
-          <Image
-            source={{ uri: media.coverImage }}
-            resizeMode="cover"
-            style={[StyleSheet.absoluteFill, styles.heroImage]}
-            accessible={false}
-          />
+          {media.coverImage ? (
+            <Image
+              source={{ uri: media.coverImage }}
+              resizeMode="cover"
+              style={[StyleSheet.absoluteFill, styles.heroImage]}
+              accessible={false}
+            />
+          ) : null}
           <View style={styles.brandBlock}>
             <SchoolMark size={78} style={styles.logoMark} />
             <AppText
@@ -67,14 +69,6 @@ export function SplashScreen() {
               variant="outline"
               onPress={() => navigate("SchoolDetails")}
             />
-            <AppText
-              size={10}
-              color={C.muted}
-              align="center"
-              style={styles.demoNote}
-            >
-              DEMO BUILD · Sample school data
-            </AppText>
           </View>
         </View>
       </View>

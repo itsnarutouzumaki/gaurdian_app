@@ -7,6 +7,9 @@ import {
   View,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { logoutGuardian } from "./src/services/auth-api";
+import { loadGuardianAppData } from "./src/services/guardian-data/load-guardian-app-data";
+import type { GuardianAppData } from "./src/services/guardian-data/guardian-bootstrap.types";
 import {
   SafeAreaProvider,
   SafeAreaView,
@@ -14,7 +17,6 @@ import {
 } from "react-native-safe-area-context";
 import { AppProvider, LanguageProvider } from "./src/app-context";
 import type { AppContextValue } from "./src/app-context";
-import mock from "./src/data/mock-data.json";
 import { getSchoolConfiguration } from "./src/config/schoolConfig";
 import { getActiveSchoolConfig } from "./src/data/schools/registry";
 import { getHardwareBackDecision } from "./src/lib/back-navigation";
@@ -63,10 +65,8 @@ import { SchoolDetailsScreen } from "./src/screens/SchoolDetailsScreen";
 import { TeachersDirectoryScreen } from "./src/screens/TeachersDirectoryScreen";
 import { TeacherProfileScreen } from "./src/screens/TeacherProfileScreen";
 
-const seed = mock;
 const schoolConfig = getActiveSchoolConfig();
 const defaultLanguage = getSchoolConfiguration().localization.defaultLanguage;
-const children = seed.children;
 const languageStorageKey = "guardian-app.language";
 
 function GuardianApp() {
@@ -84,32 +84,31 @@ function GuardianApp() {
   );
   const [preferencesReady, setPreferencesReady] = useState(false);
   const [guardian, setGuardian] = useState<GuardianProfile>(() => ({
-    ...seed.guardian,
+    id: "",
+    fullName: "",
+    mobileNumber: "",
+    email: "",
+    profilePhotoUrl: null,
+    address: "",
+    relationship: "",
+    profileComplete: false,
   }));
-  const [notifications, setNotifications] = useState<Notice[]>(() =>
-    seed.notifications.map((item: Notice) => ({ ...item })),
-  );
-  const [complaints, setComplaints] = useState<ComplaintRecord[]>(() =>
-    seed.complaints.map((item) => ({ ...item })),
-  );
-  const [leaveRequests, setLeaveRequests] = useState<LeaveRequestRecord[]>(() =>
-    seed.leaveRequests.map((item) => ({ ...item })),
-  );
-  const [linkRequests, setLinkRequests] = useState<LinkRequestRecord[]>(() =>
-    seed.linkRequests.map((item) => ({ ...item })),
-  );
-  const [selectedChildId, setSelectedChildIdState] = useState<string>(
-    children[0]?.id || "",
-  );
+  const [children, setChildren] = useState<GuardianAppData["children"]>([]);
+  const [examinations, setExaminations] = useState<GuardianAppData["examinations"]>([]);
+  const [notifications, setNotifications] = useState<Notice[]>([]);
+  const [complaints, setComplaints] = useState<ComplaintRecord[]>([]);
+  const [leaveRequests, setLeaveRequests] = useState<LeaveRequestRecord[]>([]);
+  const [linkRequests, setLinkRequests] = useState<LinkRequestRecord[]>([]);
+  const [teachers, setTeachers] = useState<GuardianAppData["teachers"]>([]);
+  const [selectedChildId, setSelectedChildIdState] = useState<string>("");
   const [selectedYear, setSelectedYear] = useState<string>(
     schoolConfig.school.defaultAcademicYear,
   );
   const [selectedSubjectId, setSelectedSubjectId] = useState<string>("");
-  const [selectedTeacherId, setSelectedTeacherId] = useState<string>(
-    schoolConfig.teachers[0]?.id || "",
-  );
+  const [selectedTeacherId, setSelectedTeacherId] = useState<string>("");
   const [toast, setToast] = useState<ToastMessage | null>(null);
   const [logoutDialogVisible, setLogoutDialogVisible] = useState(false);
+  const [logoutPending, setLogoutPending] = useState(false);
   const currentRoute = stack[stack.length - 1] || {
     name: "Splash" as ScreenName,
   };
@@ -178,11 +177,45 @@ function GuardianApp() {
     setSelectedChildIdState(id);
     const child = children.find((item) => item.id === id);
     if (child) setSelectedYear(child.currentAcademicYear);
-  }, []);
-  const signIn = useCallback(() => {
+  }, [children]);
+  const signIn = useCallback((data: GuardianAppData) => {
+    setGuardian(data.guardian);
+    setChildren(data.children);
+    setExaminations(data.examinations);
+    setNotifications(data.notifications);
+    setComplaints(data.complaints);
+    setLeaveRequests(data.leaveRequests);
+    setLinkRequests(data.linkRequests);
+    setTeachers(data.teachers);
+    setSelectedChildIdState(data.children[0]?.id ?? "");
+    setSelectedYear(data.children[0]?.currentAcademicYear ?? schoolConfig.school.defaultAcademicYear);
+    setSelectedTeacherId(data.teachers[0]?.id ?? "");
     setAuthenticated(true);
     setStack([{ name: "Home" }]);
   }, []);
+  const refreshData = useCallback(async () => {
+    const data = await loadGuardianAppData();
+    setGuardian(data.guardian);
+    setChildren(data.children);
+    setExaminations(data.examinations);
+    setNotifications(data.notifications);
+    setComplaints(data.complaints);
+    setLeaveRequests(data.leaveRequests);
+    setLinkRequests(data.linkRequests);
+    setTeachers(data.teachers);
+
+    const selectedChild =
+      data.children.find((child) => child.id === selectedChildId) ??
+      data.children[0];
+    setSelectedChildIdState(selectedChild?.id ?? "");
+    setSelectedYear((current) =>
+      selectedChild?.academicYears.some((year) => year.label === current)
+        ? current
+        : selectedChild?.currentAcademicYear ??
+          schoolConfig.school.defaultAcademicYear,
+    );
+    setSelectedTeacherId(data.teachers[0]?.id ?? "");
+  }, [selectedChildId]);
   useEffect(() => {
     let active = true;
     AsyncStorage.getItem(languageStorageKey)
@@ -244,15 +277,12 @@ function GuardianApp() {
       guardian,
       setGuardian,
       children,
+      examinations,
       notifications,
-      setNotifications,
       complaints,
-      setComplaints,
       leaveRequests,
-      setLeaveRequests,
       linkRequests,
-      setLinkRequests,
-      teachers: schoolConfig.teachers,
+      teachers,
       selectedChildId,
       setSelectedChildId: changeChild,
       selectedYear,
@@ -272,12 +302,16 @@ function GuardianApp() {
       logoutDialogVisible,
       setLogoutDialogVisible,
       signIn,
+      refreshData,
       language,
       setLanguage,
       alert: showAlert,
     }),
     [
       guardian,
+      children,
+      examinations,
+      teachers,
       notifications,
       complaints,
       leaveRequests,
@@ -295,6 +329,7 @@ function GuardianApp() {
       toast,
       logoutDialogVisible,
       signIn,
+      refreshData,
       changeChild,
       language,
       setLanguage,
@@ -409,9 +444,10 @@ function GuardianApp() {
           ) : null}
           {toast ? (
             <View
+              pointerEvents="box-none"
               style={[
                 styles.toastPosition,
-                { bottom: (showTabs ? 72 : 18) + insets.bottom },
+                { top: Math.max(insets.top, 8) + 8 },
               ]}
             >
               <View
@@ -420,7 +456,7 @@ function GuardianApp() {
                   {
                     backgroundColor:
                       toast.tone === "error"
-                        ? "#922A35"
+                        ? C.danger
                         : toast.tone === "success"
                           ? "#087347"
                           : "#123C73",
@@ -453,7 +489,9 @@ function GuardianApp() {
           ) : null}
           <ModalFrame
             visible={logoutDialogVisible}
-            onClose={() => setLogoutDialogVisible(false)}
+            onClose={() => {
+              if (!logoutPending) setLogoutDialogVisible(false);
+            }}
             title="Logout"
           >
             <AppText size={13} color={C.muted} lineHeight={20}>
@@ -464,16 +502,34 @@ function GuardianApp() {
                 title="Cancel"
                 variant="outline"
                 onPress={() => setLogoutDialogVisible(false)}
+                disabled={logoutPending}
                 style={styles.logoutAction}
               />
               <ActionButton
                 title="Logout"
                 variant="danger"
-                onPress={() => {
-                  setLogoutDialogVisible(false);
-                  setAuthenticated(false);
-                  setStack([{ name: "Login" }]);
+                loading={logoutPending}
+                disabled={logoutPending}
+                onPress={async () => {
                   setToast(null);
+                  setLogoutPending(true);
+                  try {
+                    await logoutGuardian();
+                  } catch (error) {
+                    console.error("Guardian logout request failed.", error);
+                    showToast({
+                      title: "Signed out on this device",
+                      message: error instanceof Error
+                        ? error.message
+                        : "The server could not confirm logout.",
+                      tone: "error",
+                    });
+                  } finally {
+                    setLogoutDialogVisible(false);
+                    setAuthenticated(false);
+                    setStack([{ name: "Login" }]);
+                    setLogoutPending(false);
+                  }
                 }}
                 style={styles.logoutAction}
               />

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Pressable, View } from "react-native";
 import { useApp } from "../app-context";
 import {
@@ -14,9 +14,27 @@ import {
 import { ChoiceModal } from "../components/Selectors";
 import { getAcademicYear, getChild } from "../lib/selectors";
 import { money, dateLabel } from "../lib/format";
-import { shareDemoPdf } from "../lib/pdf";
+import {
+  buildFeeReceiptHtml,
+  type DocumentBrand,
+} from "../lib/document-rendering";
+import { sharePdfDocument } from "../lib/pdf";
+import {
+  getSchoolConfiguration,
+  getSchoolDocumentConfiguration,
+} from "../config/schoolConfig";
 import { C } from "../theme";
 import { styles } from "./FeesReceiptScreen.styles";
+
+function preferredReceiptId(
+  receipts: ReturnType<typeof getAcademicYear>["feeReceipts"],
+) {
+  return (
+    receipts.find((item) => item.label.startsWith("October"))?.id ||
+    receipts[receipts.length - 1]?.id ||
+    ""
+  );
+}
 
 export function FeesReceiptScreen() {
   const {
@@ -30,20 +48,31 @@ export function FeesReceiptScreen() {
   const child = getChild(children, selectedChildId);
   const year = getAcademicYear(child, selectedYear);
   const receipts = year.feeReceipts;
-  const [selectedReceiptId, setSelectedReceiptId] = useState(
-    receipts.find((r) => r.label.startsWith("October"))?.id ||
-      receipts[receipts.length - 1]?.id ||
-      "",
+  const [selectedReceiptId, setSelectedReceiptId] = useState(() =>
+    preferredReceiptId(receipts),
   );
   const [pickerOpen, setPickerOpen] = useState(false);
+  useEffect(() => {
+    setSelectedReceiptId(preferredReceiptId(receipts));
+  }, [child.id, year.label]);
   const receipt =
     receipts.find((item) => item.id === selectedReceiptId) || receipts[0];
+  const configuration = getSchoolConfiguration();
+  const documentConfiguration = getSchoolDocumentConfiguration();
+  const documentBrand: DocumentBrand = {
+    schoolName: configuration.school.name,
+    address: configuration.school.address,
+    phone: configuration.school.phone,
+    email: configuration.school.email,
+    accentColor: configuration.theme.light.primary,
+    footerNote: documentConfiguration.footerNote,
+  };
   if (!receipt)
     return (
       <Page title="Fees Receipt" onBack={goBack}>
         <InfoBanner
           title="No receipts found"
-          message="No fee receipt data is available in this academic-year mock record."
+          message="No fee receipt data is available for this academic year."
           tone="orange"
         />
       </Page>
@@ -80,7 +109,7 @@ export function FeesReceiptScreen() {
             {school.name}
           </AppText>
           <AppText size={10} color={C.muted} align="center">
-            {year.label} · Official format preview
+            {year.label}
           </AppText>
           <AppText size={18} weight="bold" style={styles.receiptTitle}>
             Fee Receipt
@@ -92,7 +121,7 @@ export function FeesReceiptScreen() {
         </View>
         <View style={styles.details}>
           <InfoRow label="Student name" value={child.fullName} />
-          <InfoRow label="Student ID" value={child.studentId} />
+          <InfoRow label="Student number" value={child.studentId} />
           <InfoRow
             label="Class / Section"
             value={`${year.className} · ${year.section}`}
@@ -135,39 +164,27 @@ export function FeesReceiptScreen() {
           />
         </View>
         <ActionButton
-          title={
-            paid ? "Download Receipt (PDF)" : "Download Fee Statement (PDF)"
-          }
+          title={paid ? "Download Receipt (PDF)" : "Download Due Notice (PDF)"}
           icon="⇩"
           onPress={() =>
-            shareDemoPdf(`Fee-Receipt-${child.fullName}-${receipt.label}`, [
-              school.name,
-              `Academic Year: ${year.label}`,
-              "FEE RECEIPT",
-              `Student: ${child.fullName}`,
-              `Student ID: ${child.studentId}`,
-              `Class: ${year.className} ${year.section}`,
-              `Period: ${receipt.label}`,
-              "",
-              "FEE BREAKDOWN",
-              ...Object.entries(receipt.breakdown).map(
-                ([label, amount]) => `${label}: ${money(amount)}`,
+            void sharePdfDocument(
+              `Fee-${paid ? "Receipt" : "Due"}-${child.fullName}-${receipt.label}`,
+              buildFeeReceiptHtml(
+                documentBrand,
+                documentConfiguration.feeReceiptTemplate,
+                child,
+                year,
+                receipt,
               ),
-              `TOTAL: ${money(receipt.total)}`,
-              `Status: ${paid ? "PAID" : "PAYMENT DUE"}`,
-              `Payment date: ${paid ? receipt.paymentDate : "Not paid"}`,
-              `Payment mode: ${paid ? receipt.paymentMode : "—"}`,
-              `Transaction ID: ${paid ? receipt.transactionId : "Not generated"}`,
-              "",
-              "DEMO DOCUMENT — Replace with the official receipt service before release.",
-            ], showToast)
+              showToast,
+            )
           }
           style={styles.download}
         />
       </Card>
       <InfoBanner
-        title="About this preview"
-        message="This receipt is rendered from the local JSON fee data. Download creates a sample PDF on the device; no payment is collected by this UI-only build."
+        title="School-reported fee information"
+        message="Receipt amounts and payment status are provided by the school. Payments are not collected in this app."
         tone="blue"
       />
       <ChoiceModal

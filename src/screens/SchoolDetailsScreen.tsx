@@ -7,6 +7,7 @@ import {
   Badge,
   Card,
   Divider,
+  InfoBanner,
   Page,
   Photo,
   SchoolMark,
@@ -59,7 +60,9 @@ export function SchoolDetailsScreen() {
         </View>
         <View style={styles.stats}>
           {[
-            { label: "Established", value: String(school.established) },
+            ...(school.established
+              ? [{ label: "Established", value: String(school.established) }]
+              : []),
             { label: "Location", value: school.shortLocation },
             { label: "Grades", value: school.grades },
           ].map((item) => (
@@ -112,7 +115,7 @@ export function SchoolDetailsScreen() {
                 onPress={() =>
                   Alert.alert(
                     "School photo",
-                    `Campus photo ${index + 1}. In production this opens the full-screen photo viewer.`,
+                    `Campus photo ${index + 1}.`,
                   )
                 }
                 style={styles.photoCard}
@@ -124,6 +127,12 @@ export function SchoolDetailsScreen() {
               </Pressable>
             ))}
           </View>
+          {media.photos.length === 0 ? (
+            <InfoBanner
+              title="No school photos yet"
+              message="School photos aren't available right now."
+            />
+          ) : null}
         </>
       ) : null}
       {tab === "Videos" ? (
@@ -157,10 +166,16 @@ export function SchoolDetailsScreen() {
                 <Badge label={video.duration} tone="gray" />
               </View>
               <AppText size={10} color={C.muted} style={styles.videoCopy}>
-                Tap to open the linked video outside the app.
+                Tap to watch the video.
               </AppText>
             </Card>
           ))}
+          {media.videos.length === 0 ? (
+            <InfoBanner
+              title="No school videos yet"
+              message="School videos aren't available right now."
+            />
+          ) : null}
         </>
       ) : null}
       {tab === "About" ? (
@@ -180,31 +195,51 @@ export function SchoolDetailsScreen() {
               {school.mission}
             </AppText>
           </Card>
-          <Card padding={14}>
-            <SectionTitle title="Campus facilities" />
-            {school.facilities.map((item: string, index: number) => (
-              <View key={item} style={styles.facility}>
-                <View style={styles.facilityIcon}>
-                  <AppText size={12} color={C.primary}>
-                    {index + 1}
-                  </AppText>
+          {school.facilities.length > 0 ? (
+            <Card padding={14}>
+              <SectionTitle title="Campus facilities" />
+              {school.facilities.map((item: string, index: number) => (
+                <View key={item} style={styles.facility}>
+                  <View style={styles.facilityIcon}>
+                    <AppText size={12} color={C.primary}>
+                      {index + 1}
+                    </AppText>
+                  </View>
+                  <AppText size={12}>{item}</AppText>
                 </View>
-                <AppText size={12}>{item}</AppText>
-              </View>
-            ))}
-          </Card>
-          <Card padding={14}>
-            <SectionTitle title="School contact" />
-            <AppText size={12} color={C.muted} style={styles.address}>
-              {school.address}
-            </AppText>
-            <AppText size={12} color={C.primary} style={styles.phone}>
-              {school.phone}
-            </AppText>
-            <AppText size={12} color={C.primary} style={styles.email}>
-              {school.email}
-            </AppText>
-          </Card>
+              ))}
+            </Card>
+          ) : null}
+          {school.address || school.phone || school.email || school.website ? (
+            <Card padding={14}>
+              <SectionTitle title="School contact" />
+              {school.address ? (
+                <AppText size={12} color={C.muted} style={styles.address}>
+                  {school.address}
+                </AppText>
+              ) : null}
+              {school.phone ? (
+                <AppText size={12} color={C.primary} style={styles.phone}>
+                  {school.phone}
+                </AppText>
+              ) : null}
+              {school.email ? (
+                <AppText size={12} color={C.primary} style={styles.email}>
+                  {school.email}
+                </AppText>
+              ) : null}
+              {school.website ? (
+                <AppText size={12} color={C.primary} style={styles.email}>
+                  {school.website}
+                </AppText>
+              ) : null}
+            </Card>
+          ) : (
+            <InfoBanner
+              title="School contact details unavailable"
+              message="School contact information has not been added yet."
+            />
+          )}
         </>
       ) : null}
       {tab === "Teachers" ? (
@@ -229,6 +264,12 @@ export function SchoolDetailsScreen() {
                 }}
               />
             ))}
+            {teachers.length === 0 ? (
+              <InfoBanner
+                title="No teacher profiles available"
+                message="Teacher details are not available yet."
+              />
+            ) : null}
           </View>
         </>
       ) : null}

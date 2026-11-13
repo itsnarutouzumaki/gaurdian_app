@@ -1,24 +1,23 @@
 import React from "react";
 import { View } from "react-native";
 import { useApp } from "../app-context";
+import { getSchoolConfiguration } from "../config/schoolConfig";
 import { AppText, Card, Divider, InfoBanner, Page } from "../components/UI";
 import { C } from "../theme";
-import mock from "../data/mock-data.json";
-import type { PolicySection } from "../types";
 import { styles } from "./TermsConditionsScreen.styles";
 
 export function TermsConditionsScreen() {
-  const { goBack, school } = useApp();
-  const sections: PolicySection[] = mock.termsSections;
+  const { goBack, school, language } = useApp();
+  const sections = getSchoolConfiguration().guardianContent.termsSections[language];
   return (
     <Page
       title="Terms & Conditions"
-      subtitle="Demo policy · Last updated 24 October 2026"
+      subtitle="Conditions for using the guardian app"
       onBack={goBack}
     >
       <InfoBanner
-        title="Illustrative terms"
-        message="These sample terms are for UI testing. The school must approve production legal terms before release."
+        title="Using the guardian app"
+        message="Use this app only to access school information and student records you are authorized to view."
       />
       <Card padding={15}>
         <AppText size={17} weight="bold">

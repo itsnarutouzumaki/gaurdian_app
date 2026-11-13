@@ -1,5 +1,3 @@
-import greenwoodApp from "./greenwood-demo/app-config.json";
-import greenwoodTeachers from "./greenwood-demo/teachers.json";
 import { getSchoolConfiguration } from "../../config/schoolConfig";
 import type {
   AppConfiguration,
@@ -23,34 +21,31 @@ type UnresolvedSchoolConfiguration = Omit<
   media: SchoolMediaConfig;
 };
 
-type RegisteredSchoolId = "greenwood-demo";
 const sharedSchool = getSchoolConfiguration();
 
-const schoolRegistry: Record<RegisteredSchoolId, UnresolvedSchoolConfiguration> = {
-  "greenwood-demo": {
+const schoolRegistry: Record<string, UnresolvedSchoolConfiguration> = {
+  [sharedSchool.schoolId]: {
     school: {
       ...sharedSchool.school,
       id: sharedSchool.schoolId,
       defaultAcademicYear: sharedSchool.academic.defaultAcademicYear,
       availableAcademicYears: sharedSchool.academic.availableAcademicYears,
     },
-    app: greenwoodApp,
+    app: sharedSchool.parentApp,
     theme: sharedSchool.theme,
     media: {
-      coverImage: sharedSchool.media.coverImages[0],
+      coverImage: sharedSchool.media.coverImages[0] ?? null,
       photos: sharedSchool.media.galleryImages,
       videos: sharedSchool.media.videos,
     },
-    teachers: greenwoodTeachers,
   },
 };
 
 function resolveActiveSchool(): SchoolConfiguration {
-  const registeredSchoolId: RegisteredSchoolId = "greenwood-demo";
-  if (sharedSchool.schoolId !== registeredSchoolId) {
+  const config = schoolRegistry[sharedSchool.schoolId];
+  if (!config) {
     throw new Error(`No school configuration registered for "${sharedSchool.schoolId}".`);
   }
-  const config = schoolRegistry[registeredSchoolId];
   if (config.school.id !== sharedSchool.schoolId) {
     throw new Error(`School ID "${config.school.id}" does not match shared school ID "${sharedSchool.schoolId}".`);
   }

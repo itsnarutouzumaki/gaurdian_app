@@ -2,7 +2,7 @@ export type SchoolInformation = {
   id: string;
   name: string;
   tagline: string;
-  established: number;
+  established: number | null;
   address: string;
   shortLocation: string;
   phone: string;
@@ -54,7 +54,6 @@ export type AppConfiguration = {
   slug: string;
   scheme: string;
   version: string;
-  demoMode: boolean;
   android: {
     package: string;
     adaptiveIcon: {
@@ -103,7 +102,7 @@ export type TeacherRecord = {
 };
 
 export type SchoolMediaConfig = {
-  coverImage: string;
+  coverImage: string | null;
   photos: string[];
   videos: SchoolVideo[];
 };
@@ -113,5 +112,4 @@ export type SchoolConfiguration = {
   app: AppConfiguration;
   theme: SchoolTheme;
   media: SchoolMediaConfig;
-  teachers: TeacherRecord[];
 };

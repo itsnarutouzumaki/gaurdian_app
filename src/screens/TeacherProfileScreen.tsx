@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { ScrollView, View } from "react-native";
-import { useApp, useAppAlert } from "../app-context";
+import { useApp } from "../app-context";
 import {
-  ActionButton,
   AppText,
   Avatar,
   Badge,
@@ -18,8 +17,7 @@ import { C } from "../theme";
 import { styles } from "./TeacherProfileScreen.styles";
 
 export function TeacherProfileScreen() {
-  const Alert = useAppAlert();
-  const { teachers, selectedTeacherId, goBack, school } = useApp();
+  const { teachers, selectedTeacherId, goBack } = useApp();
   const teacher = getTeacher(teachers, selectedTeacherId);
   const [tab, setTab] = useState("About");
   return (
@@ -53,12 +51,15 @@ export function TeacherProfileScreen() {
       </View>
       <View style={styles.stats}>
         {[
-          { value: `${teacher.experienceYears}+`, label: "Years teaching" },
-          {
-            value: String(teacher.qualifications.length),
-            label: "Qualifications",
-          },
-          { value: String(teacher.classes.length), label: "Classes taught" },
+          ...(teacher.experienceYears > 0
+            ? [{ value: `${teacher.experienceYears}+`, label: "Years teaching" }]
+            : []),
+          ...(teacher.qualifications.length
+            ? [{ value: String(teacher.qualifications.length), label: "Qualifications" }]
+            : []),
+          ...(teacher.classes.length
+            ? [{ value: String(teacher.classes.length), label: "Classes taught" }]
+            : []),
         ].map((item) => (
           <View key={item.label} style={styles.stat}>
             <AppText size={19} color={C.primary} weight="bold">
@@ -90,31 +91,43 @@ export function TeacherProfileScreen() {
             <AppText size={14} weight="bold">
               About
             </AppText>
-            <AppText size={12} color={C.muted} style={styles.about}>
-              {teacher.about}
-            </AppText>
-            <Divider space={13} />
-            <AppText size={12} weight="bold">
-              Teaching specialization
-            </AppText>
-            <AppText size={12} color={C.muted} style={styles.specialization}>
-              {teacher.specialization}
-            </AppText>
+            {teacher.about ? (
+              <AppText size={12} color={C.muted} style={styles.about}>
+                {teacher.about}
+              </AppText>
+            ) : null}
+            {teacher.specialization ? (
+              <>
+                <Divider space={13} />
+                <AppText size={12} weight="bold">
+                  Teaching specialization
+                </AppText>
+                <AppText size={12} color={C.muted} style={styles.specialization}>
+                  {teacher.specialization}
+                </AppText>
+              </>
+            ) : null}
           </Card>
-          <Card padding={14}>
-            <SectionTitle title="Contact and availability" />
-            <ContactRow label="School email" value={teacher.email} />
-            <ContactRow label="School phone" value={teacher.phone} />
-            <ContactRow label="Office hours" value={teacher.officeHours} />
-            <ContactRow
-              label="Languages"
-              value={teacher.languages.join(", ")}
-            />
-            <ContactRow
-              label="Classes taught"
-              value={teacher.classes.join(", ")}
-            />
-          </Card>
+          {teacher.email ||
+          teacher.phone ||
+          teacher.officeHours ||
+          teacher.languages.length ||
+          teacher.classes.length ? (
+            <Card padding={14}>
+              <SectionTitle title="Contact and availability" />
+              <ContactRow label="School email" value={teacher.email} />
+              <ContactRow label="School phone" value={teacher.phone} />
+              <ContactRow label="Office hours" value={teacher.officeHours} />
+              <ContactRow
+                label="Languages"
+                value={teacher.languages.join(", ")}
+              />
+              <ContactRow
+                label="Classes taught"
+                value={teacher.classes.join(", ")}
+              />
+            </Card>
+          ) : null}
         </>
       ) : null}
       {tab === "Qualifications" ? (
@@ -131,29 +144,40 @@ export function TeacherProfileScreen() {
                 <AppText size={13} weight="bold">
                   {item.degree}
                 </AppText>
-                <AppText size={11} color={C.muted} style={styles.institution}>
-                  {item.institution}
-                </AppText>
-                <AppText size={10} color={C.muted} style={styles.year}>
-                  Completed {item.year}
-                </AppText>
+                {item.institution ? (
+                  <AppText size={11} color={C.muted} style={styles.institution}>
+                    {item.institution}
+                  </AppText>
+                ) : null}
+                {item.year ? (
+                  <AppText size={10} color={C.muted} style={styles.year}>
+                    Completed {item.year}
+                  </AppText>
+                ) : null}
               </View>
             </View>
           ))}
+          {teacher.qualifications.length === 0 ? (
+            <AppText size={12} color={C.muted}>
+              Qualification details are not available.
+            </AppText>
+          ) : null}
         </Card>
       ) : null}
       {tab === "Experience" ? (
         <>
           <Card padding={14}>
             <SectionTitle title="Professional experience" />
-            <AppText
-              size={24}
-              color={C.primary}
-              weight="bold"
-              style={styles.experienceYears}
-            >
-              {teacher.experienceYears}+ years
-            </AppText>
+            {teacher.experienceYears > 0 ? (
+              <AppText
+                size={24}
+                color={C.primary}
+                weight="bold"
+                style={styles.experienceYears}
+              >
+                {teacher.experienceYears}+ years
+              </AppText>
+            ) : null}
             <AppText size={12} color={C.muted} style={styles.experienceCopy}>
               Teaching and student mentorship
             </AppText>
@@ -190,21 +214,12 @@ export function TeacherProfileScreen() {
           ) : null}
         </>
       ) : null}
-      <ActionButton
-        title="Contact through school"
-        icon="✉"
-        onPress={() =>
-          Alert.alert(
-            "Contact teacher",
-            `Please contact ${school.name} through the school office. Teacher contact details are mock data in this UI-only build.`,
-          )
-        }
-      />
     </Page>
   );
 }
 
 function ContactRow({ label, value }: { label: string; value: string }) {
+  if (!value) return null;
   return (
     <View style={styles.contactRow}>
       <AppText size={11} color={C.muted} style={styles.contactLabel}>

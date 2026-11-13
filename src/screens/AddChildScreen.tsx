@@ -8,25 +8,73 @@ import {
   InfoBanner,
   Page,
 } from "../components/UI";
-import { isProfileComplete } from "../lib/format";
 import { C } from "../theme";
+import { createGuardianChildLinkRequest } from "../services/guardian-actions";
 import { styles } from "./AddChildScreen.styles";
 
 export function AddChildScreen() {
   const Alert = useAppAlert();
-  const {
-    navigate,
-    goBack,
-    children,
-    guardian,
-    setLinkRequests,
-    linkRequests,
-    setNotifications,
-    showToast,
-  } = useApp();
-  const [studentId, setStudentId] = useState("");
-  const [studentName, setStudentName] = useState("");
+  const { goBack, guardian, refreshData, showToast } = useApp();
+  const [studentNumber, setStudentNumber] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  const submitRequest = async () => {
+    const normalized = studentNumber.trim().toUpperCase();
+    const digits = /\d+$/.exec(normalized)?.[0];
+    if (
+      !/^[A-Z]{0,5}\d{1,2}$/.test(normalized) ||
+      !digits ||
+      Number(digits) === 0
+    ) {
+      Alert.alert(
+        "Check student number",
+        "Enter up to five letters followed by a number from 1 to 99, such as A1 or AAAAB01.",
+      );
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      await createGuardianChildLinkRequest({
+        studentNumber: normalized,
+        relationship: guardian.relationship,
+      });
+    } catch (error) {
+      console.error("Child access request failed.", error);
+      showToast({
+        title: "Request not submitted",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Unable to submit the access request.",
+        tone: "error",
+      });
+      setSubmitting(false);
+      return;
+    }
+
+    setStudentNumber("");
+    showToast({
+      title: "Request submitted",
+      message:
+        "The school received your access request. The student will appear after approval.",
+      tone: "success",
+    });
+    try {
+      await refreshData();
+    } catch (error) {
+      console.error("Unable to refresh data after a child access request.", error);
+      showToast({
+        title: "Request submitted",
+        message:
+          "The school received your request. Check again later for an update.",
+        tone: "info",
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <Page
       title="Add a Child"
@@ -34,113 +82,36 @@ export function AddChildScreen() {
       onBack={goBack}
     >
       <InfoBanner
-        title="You are requesting access"
-        message="The principal will verify the student details. You cannot create a student profile from the guardian app."
+        title="Request to add a child"
+        message="The school will check the student number before adding the child to your account."
       />
       <Card padding={17}>
         <Field
-          label="Student ID"
-          value={studentId}
-          onChangeText={setStudentId}
-          placeholder="e.g. 2026-A-05-A-012"
+          label="Student number"
+          value={studentNumber}
+          onChangeText={setStudentNumber}
+          placeholder="e.g. A1 or AAAAB01"
           required
           autoCapitalize="characters"
-        />
-        <Field
-          label="Student full name"
-          value={studentName}
-          onChangeText={setStudentName}
-          placeholder="Enter name exactly as school records"
-          required
+          maxLength={7}
         />
         <AppText size={11} color={C.muted} style={styles.idHint}>
-          The student ID includes academic year, class, section and roll number.
+          Enter the student number provided by the school.
         </AppText>
         <ActionButton
           title="Submit access request"
           loading={submitting}
-          onPress={() => {
-            if (!isProfileComplete(guardian)) {
-              const missing = [
-                !guardian.fullName.trim() ? "Full name" : null,
-                !guardian.mobileNumber.trim() ? "Mobile number" : null,
-                !guardian.email.trim() ? "Email address" : null,
-                !guardian.profilePhotoUrl ? "Profile photo" : null,
-              ].filter(Boolean) as string[];
-              showToast({
-                title: "Please complete your profile first",
-                message: `Missing: ${missing.join(", ")}.`,
-                tone: "error",
-              });
-              navigate("EditProfile", {
-                notice:
-                  "Complete the required profile fields before linking a child.",
-                missingFields: missing,
-              });
-              return;
-            }
-            if (!studentId.trim() || !studentName.trim())
-              return Alert.alert(
-                "Required fields",
-                "Enter the student ID and full name.",
-              );
-            if (
-              !/^\d{4}-[A-Z]-\d{2}-[A-Z]-\d{3}$/.test(
-                studentId.trim().toUpperCase(),
-              )
-            )
-              return Alert.alert(
-                "Check student ID",
-                "Demo ID format: 2026-A-05-A-012. You can change this format in the mock validation if your school uses a different pattern.",
-              );
-            const existing = children.find(
-              (child) =>
-                child.studentId.toLowerCase() ===
-                studentId.trim().toLowerCase(),
-            );
-            if (existing)
-              return Alert.alert(
-                "Already linked",
-                `${existing.fullName} is already visible in My Children.`,
-              );
-            setSubmitting(true);
-            const item = {
-              id: `link-${Date.now()}`,
-              studentId: studentId.trim().toUpperCase(),
-              studentName: studentName.trim(),
-              status: "Pending",
-              createdAt: new Date().toISOString().slice(0, 10),
-            };
-            setLinkRequests([item, ...linkRequests]);
-            setNotifications((prev) => [
-              {
-                id: `n-${Date.now()}`,
-                type: "request",
-                title: "Child access request submitted",
-                message: `Your request for ${item.studentName} is waiting for principal approval.`,
-                dateLabel: "Just now",
-                read: false,
-              },
-              ...prev,
-            ]);
-            setSubmitting(false);
-            showToast({
-              title: "Request submitted",
-              message:
-                "Your request was sent to the principal. The child will appear in My Children only after approval.",
-              tone: "success",
-              action: { label: "Done", onPress: () => navigate("Home") },
-            });
-          }}
+          disabled={submitting}
+          onPress={submitRequest}
         />
       </Card>
       <Card padding={13}>
         <AppText size={13} weight="semibold">
-          Where can I find the student ID?
+          Where can I find the student number?
         </AppText>
         <AppText size={12} color={C.muted} style={styles.helpCopy}>
-          Check the student identity card or the latest school record. If the
-          format is unclear, contact the school office before submitting.
+          Check the student identity card or a school record. If the number is
+          unclear, contact the school before submitting.
         </AppText>
       </Card>
     </Page>

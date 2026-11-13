@@ -11,16 +11,6 @@ export const SCHOOL_DETAILS_TABS = [
   "Teachers",
 ] as const;
 
-export const TEACHER_DIRECTORY_FILTERS = [
-  "All",
-  "Mathematics",
-  "Science",
-  "English",
-  "Computer",
-  "Social Science",
-  "Hindi",
-] as const;
-
 export const TEACHER_PROFILE_TABS = [
   "About",
   "Qualifications",
@@ -38,7 +28,7 @@ export const PROFILE_MENU_OPTIONS: ReadonlyArray<{
   {
     icon: "✎",
     title: "Edit Profile",
-    detail: "Update your name and profile photo",
+    detail: "Update your account name and address",
     target: "EditProfile",
     color: C.primary,
     backgroundColor: C.blueSoft,
@@ -76,9 +66,3 @@ export const PROFILE_MENU_OPTIONS: ReadonlyArray<{
     backgroundColor: C.purpleSoft,
   },
 ];
-
-export const SAMPLE_PROFILE_PHOTOS = [
-  "https://i.pravatar.cc/240?img=47",
-  "https://i.pravatar.cc/240?img=48",
-  "https://i.pravatar.cc/240?img=49",
-] as const;

@@ -15,6 +15,7 @@ android/app/.cxx/
 android/app/.externalNativeBuild/
 android/build/
 android/local.properties
+test-parent-credentials.local.json
 *.apk
 *.aab
 ios/Pods/

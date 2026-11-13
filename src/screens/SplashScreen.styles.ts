@@ -32,5 +32,4 @@ export const styles = StyleSheet.create({
     paddingBottom: 32,
   },
   sheetCopy: { marginTop: 9 },
-  demoNote: { marginTop: 14 },
 });

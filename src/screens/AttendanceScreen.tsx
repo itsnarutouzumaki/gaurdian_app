@@ -186,7 +186,7 @@ export function AttendanceScreen() {
       </Card>
       <InfoBanner
         title="Attendance legend"
-        message="Holidays and non-school days are not counted as absences. Grey dates indicate weekends, no-class days or records not yet marked."
+        message="School holidays are not counted as absences. Grey dates mean weekends, no class, or attendance not marked yet."
       />
     </Page>
   );

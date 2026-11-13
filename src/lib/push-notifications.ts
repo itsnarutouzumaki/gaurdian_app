@@ -15,15 +15,15 @@ export async function registerPushTokenWithBackend({
 }): Promise<PushRegistrationResult> {
   if (!apiBaseUrl) return { status: "not-configured" };
   if (!accessToken?.trim()) {
-    throw new Error("Push registration requires an authenticated access token.");
+    throw new Error("Could not enable notifications. Please try again.");
   }
   if (!deviceToken?.trim()) {
-    throw new Error("Push registration requires a native device token.");
+    throw new Error("Could not enable notifications on this device.");
   }
 
   const base = new URL(apiBaseUrl);
   if (base.protocol !== "https:" && !["localhost", "127.0.0.1"].includes(base.hostname)) {
-    throw new Error("Push registration requires HTTPS outside local development.");
+    throw new Error("Could not enable notifications. Please try again.");
   }
 
   const response = await fetch(new URL("/v1/device-tokens", base).toString(), {
@@ -35,7 +35,7 @@ export async function registerPushTokenWithBackend({
     body: JSON.stringify({ token: deviceToken, platform }),
   });
   if (!response.ok) {
-    throw new Error(`Push token registration failed with HTTP ${response.status}.`);
+    throw new Error("Could not enable notifications. Please try again.");
   }
   return { status: "registered" };
 }

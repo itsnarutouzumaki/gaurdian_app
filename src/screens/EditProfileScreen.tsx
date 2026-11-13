@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import { Pressable, View } from "react-native";
-import ImageCropPicker from "react-native-image-crop-picker";
+import { View } from "react-native";
 import { useApp, useAppAlert } from "../app-context";
 import {
   ActionButton,
@@ -10,10 +9,9 @@ import {
   Field,
   InfoBanner,
   Page,
-  RequiredIndicator,
 } from "../components/UI";
 import { C } from "../theme";
-import { SAMPLE_PROFILE_PHOTOS } from "../data/screen-options";
+import { updateGuardianProfile } from "../services/guardian-actions";
 import { styles } from "./EditProfileScreen.styles";
 
 export function EditProfileScreen() {
@@ -21,97 +19,65 @@ export function EditProfileScreen() {
   const {
     guardian,
     setGuardian,
-    navigate,
     replace,
     goBack,
-    currentRoute,
     showToast,
-    school,
+    refreshData,
   } = useApp();
   const [name, setName] = useState(guardian.fullName);
   const [address, setAddress] = useState(guardian.address || "");
-  const [photo, setPhoto] = useState<string | null>(guardian.profilePhotoUrl);
   const [saving, setSaving] = useState(false);
-  const notice = currentRoute.params?.notice as string | undefined;
-  const missing =
-    (currentRoute.params?.missingFields as string[] | undefined) || [];
-  const choosePhoto = async () => {
-    try {
-      const result = await ImageCropPicker.openPicker({
-        mediaType: "photo",
-        cropping: true,
-        width: 512,
-        height: 512,
-        compressImageQuality: 0.85,
-      });
-      setPhoto(result.path);
-    } catch (error) {
-      if (
-        typeof error === "object" &&
-        error !== null &&
-        "code" in error &&
-        error.code === "E_PICKER_CANCELLED"
-      ) {
-        return;
-      }
-      console.error("Unable to open the native photo picker.", error);
-      Alert.alert(
-        "Photo picker unavailable",
-        "Use one of the sample portraits below to finish the UI test.",
-      );
+
+  const save = async () => {
+    const fullName = name.trim();
+    if (!fullName) {
+      Alert.alert("Name required", "Enter your full name before saving.");
+      return;
     }
+
+    setSaving(true);
+    try {
+      await updateGuardianProfile({ fullName, address: address.trim() });
+      setGuardian((current) => ({
+        ...current,
+        fullName,
+        address: address.trim(),
+      }));
+    } catch (error) {
+      console.error("Guardian profile update failed.", error);
+      showToast({
+        title: "Profile not updated",
+        message:
+          error instanceof Error ? error.message : "Unable to update your profile.",
+        tone: "error",
+      });
+      setSaving(false);
+      return;
+    }
+
+    try {
+      await refreshData();
+    } catch (error) {
+      console.error("Unable to refresh data after a profile update.", error);
+    }
+    setSaving(false);
+    showToast({
+      title: "Profile updated",
+      message: "Your changes were saved to the school account.",
+      tone: "success",
+      action: { label: "Done", onPress: () => replace("MyProfile") },
+    });
   };
+
   return (
     <Page
       title="Edit Profile"
       subtitle="Keep your account details up to date"
       onBack={goBack}
     >
-      {notice ? (
-        <InfoBanner
-          title="Profile completion required"
-          message={notice}
-          tone="orange"
-          icon="!"
-        />
-      ) : null}
-      {missing.length > 0 ? (
-        <InfoBanner
-          title="Missing required details"
-          message={missing.join(", ")}
-          tone="red"
-          icon="!"
-        />
-      ) : null}
       <Card padding={16}>
         <View style={styles.photoSection}>
-          <AppText size={12} weight="semibold" style={styles.photoLabel}>
-            Profile photo
-            <RequiredIndicator />
-          </AppText>
-          <Pressable onPress={choosePhoto}>
-            <Avatar
-              name={name || guardian.fullName}
-              uri={photo}
-              size={92}
-              border
-            />
-            <View style={styles.editIcon}>
-              <AppText size={13} color="#fff">
-                ✎
-              </AppText>
-            </View>
-          </Pressable>
-          <Pressable onPress={choosePhoto} style={styles.changePhoto}>
-            <AppText size={12} color={C.primary} weight="semibold">
-              Change profile picture
-            </AppText>
-          </Pressable>
-          {!photo ? (
-            <AppText size={11} color={C.danger} style={styles.requiredNote}>
-              A profile photo is required before adding a child.
-            </AppText>
-          ) : null}
+          <Avatar name={name || guardian.fullName} uri={guardian.profilePhotoUrl} size={92} border />
         </View>
         <Field
           label="Full name"
@@ -119,38 +85,19 @@ export function EditProfileScreen() {
           onChangeText={setName}
           placeholder="Enter your full name"
           required
-          error={
-            name.trim()
-              ? ""
-              : missing.includes("Full name")
-                ? "Please enter your full name."
-                : undefined
-          }
         />
         <Field
           label="Mobile number"
           value={guardian.mobileNumber}
           editable={false}
-          placeholder="Registered mobile number"
-          required
-          error={
-            missing.includes("Mobile number")
-              ? "Required. Contact the school office to correct this field."
-              : undefined
-          }
+          placeholder="Not provided"
         />
         <Field
           label="Email address"
           value={guardian.email}
           editable={false}
-          placeholder="Registered email"
+          placeholder="Not provided"
           keyboardType="email-address"
-          required
-          error={
-            missing.includes("Email address")
-              ? "Required. Contact the school office to correct this field."
-              : undefined
-          }
         />
         <Field
           label="Address"
@@ -160,80 +107,16 @@ export function EditProfileScreen() {
           multiline
         />
         <InfoBanner
-          title="Some account details are locked"
-          message="For account safety, guardian cannot edit mobile number or email in the app. Contact the school office if either is incorrect."
+          title="Account contact details"
+          message="To change your mobile number or email, contact the school office."
         />
-        <AppText
-          size={11}
-          color={C.muted}
-          weight="semibold"
-          style={styles.sampleHeading}
-        >
-          Or choose a sample portrait for testing
-        </AppText>
-        <View style={styles.samplePhotos}>
-          {SAMPLE_PROFILE_PHOTOS.map((uri, index) => (
-            <Pressable
-              key={uri}
-              onPress={() => setPhoto(uri)}
-              style={[
-                styles.samplePhoto,
-                photo === uri && styles.samplePhotoSelected,
-              ]}
-            >
-              <Avatar name={`Demo portrait ${index + 1}`} uri={uri} size={50} />
-            </Pressable>
-          ))}
-        </View>
         <ActionButton
           title="Save Changes"
           loading={saving}
-          onPress={() => {
-            const validName = Boolean(name.trim());
-            const validPhoto = Boolean(photo);
-            const validMobile = Boolean(guardian.mobileNumber.trim());
-            const validEmail = Boolean(guardian.email.trim());
-            if (!validName || !validPhoto || !validMobile || !validEmail) {
-              const missed = [
-                !validName ? "Full name" : null,
-                !validMobile ? "Mobile number" : null,
-                !validEmail ? "Email address" : null,
-                !validPhoto ? "Profile photo" : null,
-              ]
-                .filter(Boolean)
-                .join(", ");
-              Alert.alert(
-                "Profile incomplete",
-                `Please complete these required fields: ${missed}. If mobile or email is missing, contact the school office.`,
-              );
-              return;
-            }
-            setSaving(true);
-            setGuardian((prev) => ({
-              ...prev,
-              fullName: name.trim(),
-              profilePhotoUrl: photo,
-              address: address.trim(),
-              profileComplete: true,
-            }));
-            setSaving(false);
-            showToast({
-              title: "Profile updated",
-              message: "Your profile details have been updated in this demo.",
-              tone: "success",
-              action: { label: "Done", onPress: () => replace("MyProfile") },
-            });
-          }}
+          disabled={saving}
+          onPress={save}
           style={styles.save}
         />
-        <AppText
-          size={10}
-          color={C.muted}
-          align="center"
-          style={styles.schoolNote}
-        >
-          School: {school.name}
-        </AppText>
       </Card>
     </Page>
   );

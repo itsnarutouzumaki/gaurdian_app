@@ -19,7 +19,6 @@ import { styles } from "./MyProfileScreen.styles";
 export function MyProfileScreen() {
   const {
     guardian,
-    school,
     navigate,
     setLogoutDialogVisible,
     language,
@@ -61,7 +60,7 @@ export function MyProfileScreen() {
         {!isProfileComplete(guardian) ? (
           <InfoBanner
             title="Complete your profile"
-            message="Your full name, mobile number, email and photo are required before you can request access to another child."
+            message="Add your full name before continuing."
             tone="orange"
           />
         ) : null}
@@ -146,9 +145,6 @@ export function MyProfileScreen() {
           </AppText>
         </Pressable>
       </Card>
-      <AppText size={10} color={C.muted} align="center">
-        {school.name} · Demo UI 1.0.0
-      </AppText>
       <ChoiceModal
         visible={languagePicker}
         title="Choose app language"

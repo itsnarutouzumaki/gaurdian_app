@@ -126,8 +126,11 @@ function inspectDirectory(directory) {
 
 inspectDirectory(path.join(root, 'src'));
 inspectSource(path.join(root, 'App.tsx'));
-const mockData = JSON.parse(
-  fs.readFileSync(path.join(root, 'src/data/mock-data.json'), 'utf8'),
+const sharedConfig = JSON.parse(
+  fs.readFileSync(
+    path.resolve(root, '..', 'shared/school-config.json'),
+    'utf8',
+  ),
 );
 const optionsPath = path.join(root, 'src/data/screen-options.ts');
 const optionsText = fs.readFileSync(optionsPath, 'utf8');
@@ -162,22 +165,20 @@ function inspectOptions(node) {
   ts.forEachChild(node, inspectOptions);
 }
 inspectOptions(optionsSource);
-const localizedMockContent = [
-  ...localizedOptions,
-  ...mockData.notifications.flatMap((notice) => [
-    notice.title,
-    notice.message,
-    notice.dateLabel,
-  ]),
-  ...mockData.helpTopics.flatMap((topic) => [topic.title, topic.body]),
-  ...mockData.termsSections.flatMap((section) => [section.title, section.body]),
-  ...mockData.privacySections.flatMap((section) => [section.title, section.body]),
-];
-for (const value of localizedMockContent) {
+for (const value of localizedOptions) {
   if (entries.has(value)) continue;
   const locations = missingStrings.get(value) || [];
-  locations.push('src/data/mock-data.json');
+  locations.push('src/data/screen-options.ts');
   missingStrings.set(value, locations);
+}
+for (const section of ['helpTopics', 'termsSections', 'privacySections']) {
+  const english = sharedConfig.guardianContent[section].en;
+  const hindi = sharedConfig.guardianContent[section].hi;
+  assert.equal(english.length, hindi.length, `${section} English and Hindi content must have matching entries`);
+  for (let index = 0; index < english.length; index += 1) {
+    assert.ok(english[index].title && english[index].body, `${section} English entry ${index} is incomplete`);
+    assert.ok(hindi[index].title && hindi[index].body, `${section} Hindi entry ${index} is incomplete`);
+  }
 }
 assert.equal(
   missingStrings.size,
@@ -202,9 +203,8 @@ try {
   const { translate } = require(modulePath);
   assert.equal(translate('My Profile', 'hi'), 'मेरी प्रोफ़ाइल');
   assert.equal(translate('My Profile', 'en'), 'My Profile');
-  assert.equal(translate('4 unread updates', 'hi'), '4 अपठित अपडेट');
-  assert.equal(translate('2 unread notifications', 'hi'), '2 अपठित सूचनाएँ');
-  assert.match(translate('A demo PDF was created at: file:///demo.pdf', 'hi'), /डेमो PDF/);
+  assert.equal(translate('4 unread updates', 'hi'), '4 अपडेट नहीं पढ़े गए');
+  assert.equal(translate('2 unread notifications', 'hi'), '2 सूचनाएँ नहीं पढ़ीं');
   assert.equal(translate('September 2026', 'hi'), 'सितंबर 2026');
   assert.equal(translate('English', 'hi'), 'अंग्रेज़ी');
   assert.equal(translate('हिन्दी', 'hi'), 'हिन्दी');
