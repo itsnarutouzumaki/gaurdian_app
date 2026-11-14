@@ -15,7 +15,7 @@ export async function requestApi<T>(
       "Authenticated GET requests require an account-specific cache scope.",
     );
   }
-  const key = method === "GET"
+  const key = method === "GET" && options.cache !== false
     ? buildCacheKey(path, options.cacheScope ?? "public")
     : undefined;
   if (key) {

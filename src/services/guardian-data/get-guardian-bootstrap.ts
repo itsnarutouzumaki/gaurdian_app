@@ -4,7 +4,7 @@ import type { GuardianBootstrap } from "./guardian-bootstrap.types";
 export async function getGuardianBootstrap() {
   const snapshot = await authenticatedRequest<GuardianBootstrap>(
     "/guardian/bootstrap",
-    { method: "GET" },
+    { method: "GET", cache: false },
   );
   if (
     typeof snapshot !== "object"

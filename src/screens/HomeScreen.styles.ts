@@ -2,11 +2,8 @@ import { StyleSheet } from "react-native";
 import { C } from "../theme";
 
 export const styles = StyleSheet.create({
-  schoolCard: { marginTop: -2 },
-  schoolRow: { flexDirection: "row", gap: 10, alignItems: "center" },
   flex: { flex: 1 },
   mutedLine: { marginTop: 2 },
-  schoolButton: { marginTop: 12 },
   childRow: { flexDirection: "row", alignItems: "center", gap: 12 },
   childMeta: { marginTop: 2 },
   childId: { marginTop: 3 },

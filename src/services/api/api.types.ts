@@ -5,6 +5,7 @@ export type ApiRequestOptions = {
   body?: unknown;
   accessToken?: string;
   cacheScope?: string;
+  cache?: boolean;
 };
 
 export type ApiEnvelope<T> = {

@@ -4,8 +4,8 @@ import { C } from "../theme";
 export const styles = StyleSheet.create({
   pageContent: { padding: 0, flex: 1, gap: 0 },
   root: { flex: 1, backgroundColor: C.primaryDark },
-  hero: { flex: 1, justifyContent: "space-between" },
-  heroImage: { opacity: 0.72 },
+  hero: { flex: 1, justifyContent: "space-between", overflow: "hidden" },
+  heroImage: { opacity: 0.72, width: "100%", height: "100%" },
   brandBlock: {
     alignItems: "center",
     paddingTop: 72,

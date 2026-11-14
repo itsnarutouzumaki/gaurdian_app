@@ -14,7 +14,9 @@ export type GuardianBootstrapChild = {
   studentNumber: string;
   fullName: string;
   admissionNumber?: string;
+  gender?: string;
   photoFileId?: string;
+  photoUrl?: string;
   rollNumber?: string;
   relationship: string;
   classSection?: {
@@ -68,7 +70,9 @@ export type GuardianBootstrapChild = {
     specialization?: string;
     biography?: string;
     languages?: string[];
+    gender?: string;
     photoFileId?: string;
+    photoUrl?: string;
   }>;
 };
 
@@ -89,7 +93,9 @@ export type GuardianBootstrap = {
       fullName: string;
       phone: string;
       email: string;
+      gender?: string;
       photoFileId?: string;
+      photoUrl?: string;
       address?: string;
       relationship: string;
     };

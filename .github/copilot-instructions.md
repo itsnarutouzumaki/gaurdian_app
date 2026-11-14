@@ -143,7 +143,7 @@ Each `ScreenName` route is rendered by a corresponding component in `src/screens
 | Main | `HomeScreen`, `AddChildScreen`, `ChildDashboardScreen`, `AttendanceScreen`, `ResultsScreen`, `SubjectResultsScreen` |
 | Requests | `FeesReceiptScreen`, `RaiseComplaintScreen`, `LeaveRequestScreen` |
 | Profile | `MyProfileScreen`, `EditProfileScreen`, `ChangePasswordScreen`, `HelpSupportScreen`, `TermsConditionsScreen`, `PrivacyPolicyScreen` |
-| School and teachers | `SchoolDetailsScreen`, `TeachersDirectoryScreen`, `TeacherProfileScreen` |
+| School and teachers | `SchoolDetailsScreen`, `TeacherProfileScreen` |
 | Notifications | `NotificationsScreen` |
 
 Components: `src/components/UI.tsx` (+ `UI.styles.ts`), `Selectors.tsx` (+ `Selectors.styles.ts`), `DatePickerModal.tsx` (+ `DatePickerModal.styles.ts`), and `TeacherListRow.tsx` (+ `TeacherListRow.styles.ts`).

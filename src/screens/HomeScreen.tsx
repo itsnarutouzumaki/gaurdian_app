@@ -1,6 +1,8 @@
 import React from "react";
 import { Pressable, View } from "react-native";
 import { useApp } from "../app-context";
+import { SchoolInformationCard } from "../../../common/components/SchoolInformationCard";
+import { SchoolPhotoCarousel } from "../../../common/components/SchoolPhotoCarousel";
 import {
   ActionButton,
   AppText,
@@ -9,10 +11,11 @@ import {
   Card,
   InfoBanner,
   Page,
+  Photo,
   SchoolMark,
   SectionTitle,
 } from "../components/UI";
-import { SchoolPhotoCarousel } from "../components/SchoolPhotoCarousel";
+import { schoolPhotoSources } from "../data/schoolPhotos.generated";
 import { C } from "../theme";
 import { styles } from "./HomeScreen.styles";
 
@@ -31,33 +34,36 @@ export function HomeScreen() {
     <Page title={school.name} subtitle="Your family’s school companion" scroll>
       <SchoolPhotoCarousel
         photos={media.photos}
+        localPhotos={schoolPhotoSources}
         fallbackUri={media.coverImage}
         height={190}
         radius={20}
+        backgroundColor={C.blueSoft}
+        mutedColor={C.muted}
+        activeDotColor={C.primary}
+        renderRemotePhoto={(uri, width, height, radius) => (
+          <Photo uri={uri} height={height} radius={radius} style={{ width }} />
+        )}
+        emptyContent={
+          <AppText size={12} color={C.muted}>
+            No school photos available
+          </AppText>
+        }
       />
-      <Card padding={13} style={styles.schoolCard}>
-        <View style={styles.schoolRow}>
-          <SchoolMark size={46} />
-          <View style={styles.flex}>
-            <AppText size={15} weight="bold">
-              {school.name}
-            </AppText>
-            <AppText size={11} color={C.muted} style={styles.mutedLine}>
-              {school.tagline}
-            </AppText>
-            <AppText size={10} color={C.muted} style={styles.mutedLine}>
-              {school.shortLocation}
-            </AppText>
-          </View>
-        </View>
+      <SchoolInformationCard
+        logo={<SchoolMark size={46} />}
+        name={<AppText size={15} weight="bold">{school.name}</AppText>}
+        tagline={        <AppText size={11} color={C.muted} style={styles.mutedLine}>{school.tagline}</AppText>}
+        location={<AppText size={10} color={C.muted} style={styles.mutedLine}>{school.shortLocation}</AppText>}
+        action={
         <ActionButton
           title="View School Details"
           icon="▧"
           variant="secondary"
           onPress={() => navigate("SchoolDetails")}
-          style={styles.schoolButton}
         />
-      </Card>
+        }
+      />
 
       <SectionTitle
         title="My Children"
@@ -153,7 +159,7 @@ export function HomeScreen() {
           <QuickLink
             icon="♙"
             title="Teachers"
-            onPress={() => navigate("TeachersDirectory")}
+            onPress={() => navigate("SchoolDetails", { tab: "Teachers" })}
           />
         </View>
       </Card>

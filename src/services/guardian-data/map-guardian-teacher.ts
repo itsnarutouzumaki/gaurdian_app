@@ -14,7 +14,7 @@ export function mapGuardianTeacher(
   return {
     id: teacher._id,
     name: teacher.displayName,
-    photoUrl: "",
+    photoUrl: teacher.photoUrl ?? "",
     designation: teacher.designation ?? "Teacher",
     subjects: teacher.subjects ?? [],
     highestDegree: qualifications[0] ?? "",

@@ -1,5 +1,7 @@
 node_modules/
 dist/
+src/assets/branding/
+src/assets/school-photos/
 *.log
 .DS_Store
 .venv/

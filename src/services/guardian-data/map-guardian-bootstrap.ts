@@ -56,9 +56,12 @@ export function mapGuardianBootstrap(snapshot: GuardianBootstrap): GuardianAppDa
       fullName: snapshot.account.profile.fullName,
       mobileNumber: snapshot.account.profile.phone,
       email: snapshot.account.profile.email,
-      profilePhotoUrl: null,
+      profilePhotoUrl: snapshot.account.profile.photoUrl ?? null,
       address: snapshot.account.profile.address ?? "",
       relationship: snapshot.account.profile.relationship,
+      ...(snapshot.account.profile.gender
+        ? { gender: snapshot.account.profile.gender }
+        : {}),
       profileComplete: Boolean(
         snapshot.account.profile.fullName
         && snapshot.account.profile.phone

@@ -3,6 +3,7 @@ const path = require('node:path');
 const ts = require('typescript');
 const root = path.join(__dirname, '..');
 const sourceRoot = path.join(root, 'src');
+const commonRoot = path.resolve(root, '..', 'common');
 const files = [path.join(root, 'App.tsx'), path.join(root, 'App.styles.ts')];
 function walk(directory) {
   for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
@@ -12,6 +13,7 @@ function walk(directory) {
   }
 }
 walk(sourceRoot);
+walk(commonRoot);
 const failures = [];
 for (const file of files) {
   const result = ts.transpileModule(fs.readFileSync(file, 'utf8'), {

@@ -39,6 +39,10 @@ The React Native CLI commands clean only the selected app's native build outputs
 
 Native package identifiers, launcher/splash assets, and document templates are also configured in [`../shared/school-config.json`](../shared/school-config.json), with source images stored under `../shared/assets/`. Apply the shared settings with `npm run config:apply`; the command copies the required assets into generated Android/iOS native resource directories for packaging. These build identifiers do not change in an already installed app.
 
+School photos shown on the Parent and Teacher home screens belong in `../shared/assets/photos/`. Add `.jpg`, `.jpeg`, `.png`, or `.webp` files; both apps bundle them in case-insensitive alphabetical filename order when starting Metro or building. Parent copies these shared images and its welcome-screen branding into gitignored app-local asset folders before bundling, so Metro can serve them from the app root. The school logo and app branding images (app icon, Android adaptive icon and splash) belong in `../shared/assets/logo/`; their paths are configured in `school-config.json`.
+
+The shared school-photo carousel, home-school information card, complete school-details content, school-details header, and bottom navigation footer live in `../common/components/` and are used by both apps. Keep navigation shells and app-specific screens in their respective projects.
+
 This is a test tenant. Use only assigned test accounts and never enter real guardian, student, or payment information.
 
 ## Backend behavior
@@ -71,7 +75,7 @@ See [`MANUAL_TEST_PLAN.md`](MANUAL_TEST_PLAN.md). In-app writes in the plan pers
 
 ## Current limitations
 
-- The test school has no configured contact information, facilities, photos, or videos; those surfaces show unavailable/empty states.
+- The test school has no configured contact information, facilities, or videos; those surfaces show unavailable/empty states. School-photo carousels show their empty state until photos are added to the shared school-photo folder.
 - Teacher details are limited to what the backend returns for the signed-in guardian's linked children.
 - File upload/download flows for profile photos, complaint attachments, and scanned answer copies are not enabled.
 - Native push delivery is not configured; the in-app notification list and read state use backend records.

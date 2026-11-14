@@ -62,7 +62,6 @@ import { TermsConditionsScreen } from "./src/screens/TermsConditionsScreen";
 import { PrivacyPolicyScreen } from "./src/screens/PrivacyPolicyScreen";
 import { NotificationsScreen } from "./src/screens/NotificationsScreen";
 import { SchoolDetailsScreen } from "./src/screens/SchoolDetailsScreen";
-import { TeachersDirectoryScreen } from "./src/screens/TeachersDirectoryScreen";
 import { TeacherProfileScreen } from "./src/screens/TeacherProfileScreen";
 
 const schoolConfig = getActiveSchoolConfig();
@@ -404,8 +403,6 @@ function GuardianApp() {
         return <PrivacyPolicyScreen />;
       case "SchoolDetails":
         return <SchoolDetailsScreen />;
-      case "TeachersDirectory":
-        return <TeachersDirectoryScreen />;
       case "TeacherProfile":
         return <TeacherProfileScreen />;
       default:

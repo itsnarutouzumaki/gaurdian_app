@@ -169,7 +169,7 @@ export function mapGuardianChild(
     child: {
       id: child.id,
       fullName: child.fullName,
-      photoUrl: "",
+      photoUrl: child.photoUrl ?? "",
       studentId: child.studentNumber,
       className: child.classSection?.className ?? "",
       section: child.classSection?.section ?? "",
@@ -177,7 +177,7 @@ export function mapGuardianChild(
         ? { rollNumber: Number(child.rollNumber) }
         : {}),
       relationship: child.relationship,
-      gender: "",
+      gender: child.gender ?? "",
       dateOfBirth: "",
       bloodGroup: "",
       admissionNumber: child.admissionNumber ?? "",

@@ -12,7 +12,7 @@ export type ScreenName =
   | 'ChildDashboard' | 'Attendance' | 'Results' | 'SubjectResults' | 'FeesReceipt'
   | 'RaiseComplaint' | 'LeaveRequest' | 'Notifications' | 'MyProfile' | 'EditProfile'
   | 'ChangePassword' | 'HelpSupport' | 'TermsConditions' | 'PrivacyPolicy'
-  | 'SchoolDetails' | 'TeachersDirectory' | 'TeacherProfile';
+  | 'SchoolDetails' | 'TeacherProfile';
 
 export type Route = { name: ScreenName; params?: Record<string, unknown> };
 export type AttendanceStatus = 'present' | 'absent' | 'holiday' | 'noClass' | 'unmarked';
@@ -48,6 +48,7 @@ export type GuardianProfile = {
   fullName: string;
   mobileNumber: string;
   email: string;
+  gender?: string;
   profilePhotoUrl: string | null;
   address: string;
   relationship: string;

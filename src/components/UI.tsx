@@ -14,7 +14,7 @@ import {
   View,
   ViewStyle,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, type Edge } from "react-native-safe-area-context";
 import { useLanguage } from "../app-context";
 import { translate } from "../lib/i18n";
 import { useTranslation } from "react-i18next";
@@ -23,8 +23,13 @@ import { C, R } from "../theme";
 import { initials } from "../lib/format";
 import { getSchoolConfiguration } from "../config/schoolConfig";
 import { styles } from "./UI.styles";
+import {
+  BottomNavigationFooter,
+  type FooterTab,
+} from "../../../common/components/BottomNavigationFooter";
+import { BellIcon } from "../../../common/components/BellIcon";
 
-const schoolLogo = require("../../../shared/assets/logo.png");
+const schoolLogo = require("../assets/branding/logo.png");
 const schoolName = getSchoolConfiguration().school.name;
 
 export function Page({
@@ -35,6 +40,7 @@ export function Page({
   right,
   scroll = true,
   contentStyle,
+  safeAreaEdges,
 }: {
   children: React.ReactNode;
   title?: string;
@@ -43,6 +49,7 @@ export function Page({
   right?: React.ReactNode;
   scroll?: boolean;
   contentStyle?: StyleProp<ViewStyle>;
+  safeAreaEdges?: Edge[];
 }) {
   const language = useLanguage();
   const { t } = useTranslation();
@@ -50,7 +57,10 @@ export function Page({
     <View style={[styles.pageContent, contentStyle]}>{children}</View>
   );
   return (
-    <SafeAreaView style={styles.safe} edges={["top", "left", "right"]}>
+    <SafeAreaView
+      style={styles.safe}
+      edges={safeAreaEdges ?? ["top", "left", "right"]}
+    >
       {title ? (
         <View style={styles.header}>
           {onBack ? (
@@ -535,17 +545,6 @@ function PersonIcon({ color, size }: { color: string; size: number }) {
   );
 }
 
-function BellIcon({ color }: { color: string }) {
-  return (
-    <View style={styles.bellIcon}>
-      <View style={[styles.bellTop, { borderColor: color }]} />
-      <View style={[styles.bellBody, { borderColor: color }]} />
-      <View style={[styles.bellRim, { backgroundColor: color }]} />
-      <View style={[styles.bellClapper, { backgroundColor: color }]} />
-    </View>
-  );
-}
-
 export function Photo({
   uri,
   height = 150,
@@ -748,62 +747,42 @@ export function BottomTabs({
   hasUnreadNotifications: boolean;
 }) {
   const language = useLanguage();
-  const tabs: Array<{
-    key: "Home" | "Notifications" | "Profile";
-    label: string;
-  }> = [
-    { key: "Home", label: "Home" },
-    { key: "Notifications", label: "Notifications" },
-    { key: "Profile", label: "Profile" },
+  const tabs: Array<{ key: FooterTab; label: string; icon: React.ReactNode; unread?: boolean; unreadLabel?: string }> = [
+    {
+      key: "Home",
+      label: "Home",
+      icon: <AppText size={22} color={active === "Home" ? C.primary : C.muted} weight="semibold">⌂</AppText>,
+    },
+    {
+      key: "Notifications",
+      label: "Notifications",
+      icon: <BellIcon color={active === "Notifications" ? C.primary : C.muted} />,
+      unread: hasUnreadNotifications,
+      unreadLabel: translate("Unread notifications", language),
+    },
+    {
+      key: "Profile",
+      label: "Profile",
+      icon: <Avatar name={profileName} uri={profilePhotoUrl} size={22} fallback="person" fallbackColor={active === "Profile" ? C.primary : C.muted} />,
+    },
   ];
   return (
-    <SafeAreaView edges={["bottom"]} style={styles.bottomTabsSafeArea}>
-      <View style={styles.bottomTabs}>
-        {tabs.map((tab) => (
-          <Pressable
-            key={tab.key}
-            onPress={() => onPress(tab.key)}
-            style={styles.tabButton}
+    <BottomNavigationFooter
+      active={active}
+      onPress={onPress}
+      tabs={tabs.map((tab) => ({
+        ...tab,
+        label: (
+          <AppText
+            size={10}
+            color={active === tab.key ? C.primary : C.muted}
+            weight={active === tab.key ? "bold" : "medium"}
           >
-            {tab.key === "Home" ? (
-              <AppText
-                size={22}
-                color={active === tab.key ? C.primary : C.muted}
-                weight="semibold"
-              >
-                ⌂
-              </AppText>
-            ) : tab.key === "Notifications" ? (
-              <View>
-                <BellIcon color={active === tab.key ? C.primary : C.muted} />
-                {hasUnreadNotifications ? (
-                  <View
-                    accessible
-                    accessibilityLabel={translate("Unread notifications", language)}
-                    style={styles.notificationIndicator}
-                  />
-                ) : null}
-              </View>
-            ) : (
-              <Avatar
-                name={profileName}
-                uri={profilePhotoUrl}
-                size={22}
-                fallback="person"
-                fallbackColor={active === tab.key ? C.primary : C.muted}
-              />
-            )}
-            <AppText
-              size={10}
-              color={active === tab.key ? C.primary : C.muted}
-              weight={active === tab.key ? "bold" : "medium"}
-            >
-              {tab.label}
-            </AppText>
-          </Pressable>
-        ))}
-      </View>
-    </SafeAreaView>
+            {tab.label}
+          </AppText>
+        ),
+      }))}
+    />
   );
 }
 

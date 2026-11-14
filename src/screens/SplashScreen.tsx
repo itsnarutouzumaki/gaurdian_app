@@ -11,20 +11,24 @@ import {
 import { C } from "../theme";
 import { styles } from "./SplashScreen.styles";
 
+const splashBackground = require("../assets/branding/welcome-background.png");
+
 export function SplashScreen() {
-  const { school, media, navigate } = useApp();
+  const { school, navigate } = useApp();
   return (
-    <Page scroll={false} contentStyle={styles.pageContent}>
+    <Page
+      scroll={false}
+      contentStyle={styles.pageContent}
+      safeAreaEdges={["top"]}
+    >
       <View style={styles.root}>
         <View style={styles.hero}>
-          {media.coverImage ? (
-            <Image
-              source={{ uri: media.coverImage }}
-              resizeMode="cover"
-              style={[StyleSheet.absoluteFill, styles.heroImage]}
-              accessible={false}
-            />
-          ) : null}
+          <Image
+            source={splashBackground}
+            resizeMode="cover"
+            style={[StyleSheet.absoluteFill, styles.heroImage]}
+            accessible={false}
+          />
           <View style={styles.brandBlock}>
             <SchoolMark size={78} style={styles.logoMark} />
             <AppText
